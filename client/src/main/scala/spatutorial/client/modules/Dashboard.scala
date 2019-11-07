@@ -35,7 +35,7 @@ object Dashboard {
       <.div(
         // header, MessageOfTheDay and chart components
         <.h2("Dashboard"),
-        state.motdWrapper(Motd(_)),
+//        state.motdWrapper(Motd(_)),
         Chart(cp),
         // create a link to the To Do view
         <.div(props.router.link(TodoLoc)("Check your todos!"))

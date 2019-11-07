@@ -3,7 +3,7 @@ package spatutorial.client
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom
-import spatutorial.client.components.GlobalStyles
+import spatutorial.client.components.{GlobalStyles, Motd}
 import spatutorial.client.logger._
 import spatutorial.client.modules._
 import spatutorial.client.services.SPACircuit
@@ -21,6 +21,8 @@ object SPAMain extends js.JSApp {
 
   case object DashboardLoc extends Loc
 
+  case object MotdLoc extends Loc
+
   case object TodoLoc extends Loc
 
   // configure the router
@@ -30,6 +32,7 @@ object SPAMain extends js.JSApp {
     val todoWrapper = SPACircuit.connect(_.todos)
     // wrap/connect components to the circuit
     (staticRoute(root, DashboardLoc) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy)))
+      | staticRoute("#motd", MotdLoc) ~> render(Motd())
       | staticRoute("#todo", TodoLoc) ~> renderR(ctl => todoWrapper(Todo(_)))
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
   }.renderWith(layout)
