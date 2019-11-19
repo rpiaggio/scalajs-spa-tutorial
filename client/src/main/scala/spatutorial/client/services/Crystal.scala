@@ -13,11 +13,13 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.global
 import scala.util.{Failure, Success}
 import com.rpiaggio.crystal.Flow
+import japgolly.scalajs.react.Callback
 
 import monocle._
 import monocle.macros.Lenses
 
 import scala.language.higherKinds
+import scala.language.implicitConversions
 
 object Crystal {
   implicit private val timerIO = cats.effect.IO.timer(global)
@@ -51,6 +53,8 @@ object Crystal {
     private val ref = SignallingRef.in[SyncIO, F, A](fixedLens.get).unsafeRunSync()
 
     val flow = Flow.flow(ref.discrete)
+
+    def get: A = fixedLens.get
 
     val lens = new PowerLens[F, A] {
       def set(value: A): F[Unit] = {
@@ -99,5 +103,9 @@ object Crystal {
       Effect[F].runAsync(updateMotdRef) {
         _ => IO.unit // Not Sure how to treat here
       }
+  }
+
+  implicit def syncIO2Callback[A](s: SyncIO[A]): Callback  = Callback {
+    s.unsafeRunSync()
   }
 }

@@ -7,6 +7,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 import spatutorial.client.components.Bootstrap._
 import spatutorial.client.services.Crystal.{MotdAlgebra, Slice}
 import diode.react.ReactPot._
+import spatutorial.client.services.Crystal._
 
 /**
  * This is a simple component demonstrating how to display async data coming from the server
@@ -26,16 +27,14 @@ object Motd2 {
         },
 
         Button(Button.Props(
-          Callback {
-            p.actions.updateMotd.unsafeRunSync()
-          }
+          p.actions.updateMotd
           , CommonStyle.danger), Icon.refresh, " Update")
       )
     }
-    //    .componentDidMount(scope =>
-    //       update only if Motd is empty
-    //      Callback.when(scope.props.value.isEmpty)(scope.props.dispatchCB(UpdateMotd()))
-    //    )
+    .componentDidMount(scope =>
+      //       update only if Motd is empty
+      Callback.when(scope.props.get.isEmpty)(scope.props.actions.updateMotd)
+    )
     .build
 
   def apply(props: Slice[IO, MotdAlgebra, Pot[String]]) = Motd(props)
