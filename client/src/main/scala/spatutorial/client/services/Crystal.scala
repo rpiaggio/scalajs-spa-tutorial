@@ -30,7 +30,7 @@ object Crystal {
     def set(value: A): F[Unit]
   }
 
-  class Slice[F[_] : ConcurrentEffect : Timer, G[F[_]], M, A](private val model: M, _lens: Lens[M, A], _actions: PowerLens[F, A] => G[F]) {
+  class Slice[F[_] : ConcurrentEffect : Timer, +G[F[_]], M, A](private val model: M, _lens: Lens[M, A], _actions: PowerLens[F, A] => G[F]) {
     private val ref = SignallingRef.in[SyncIO, F, A](_lens.get(model)).unsafeRunSync()
 
     val flow = Flow.flow(ref.discrete)
