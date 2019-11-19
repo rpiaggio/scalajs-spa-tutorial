@@ -11,7 +11,7 @@ import fs2.concurrent.SignallingRef
 import scala.concurrent.ExecutionContext
 import scala.language.higherKinds
 import scala.util.{Failure, Success}
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext.global
 
 class Model[F[_] : Concurrent] {
   val motd: SignallingRef[F, String] = Model.init[F, String]("")

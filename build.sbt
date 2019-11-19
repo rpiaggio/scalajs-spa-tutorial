@@ -1,8 +1,11 @@
 import sbt.Keys._
 import sbt.Project.projectToRef
+import com.typesafe.sbt.web.PathMapping
+import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
+import com.typesafe.sbt.web.pipeline.Pipeline
 
 // a special crossProject for configuring a JS/JVM/shared structure
-lazy val shared = (crossProject.crossType(CrossType.Pure) in file("shared"))
+lazy val shared = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) in file("shared"))
   .settings(
     scalaVersion := Settings.versions.scala,
     libraryDependencies ++= Settings.sharedDependencies.value
@@ -30,7 +33,7 @@ lazy val client: Project = (project in file("client"))
     scalacOptions ++= elideOptions.value,
     jsDependencies ++= Settings.jsDependencies.value,
     // RuntimeDOM is needed for tests
-    jsDependencies += RuntimeDOM % "test",
+    jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv,
     // yes, we want to package JS dependencies
     skip in packageJSDependencies := false,
     // use Scala.js provided launcher code to start the client app
@@ -70,14 +73,15 @@ lazy val server = (project in file("server"))
 
 // Command for building a release
 lazy val ReleaseCmd = Command.command("release") {
-  state => "set elideOptions in client := Seq(\"-Xelide-below\", \"WARNING\")" ::
-    "client/clean" ::
-    "client/test" ::
-    "server/clean" ::
-    "server/test" ::
-    "server/dist" ::
-    "set elideOptions in client := Seq()" ::
-    state
+  state =>
+    "set elideOptions in client := Seq(\"-Xelide-below\", \"WARNING\")" ::
+      "client/clean" ::
+      "client/test" ::
+      "server/clean" ::
+      "server/test" ::
+      "server/dist" ::
+      "set elideOptions in client := Seq()" ::
+      state
 }
 
 // lazy val root = (project in file(".")).aggregate(client, server)

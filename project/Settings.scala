@@ -1,5 +1,9 @@
 import sbt._
+import org.portablescala.sbtplatformdeps.PlatformDepsPlugin.autoImport._
+import play.sbt.PlayImport._
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
+import sbt.Keys.{scalacOptions, _}
+
 
 /**
  * Application settings. Configure the build for your application here.
@@ -22,7 +26,8 @@ object Settings {
 
   /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
   object versions {
-    val scala = "2.11.11"
+//    val scala = "2.11.11"
+    val scala = "2.12.10"
     val scalaDom = "0.9.3"
     val scalajsReact = "1.4.2"
     val scalaCSS = "0.5.3"
@@ -40,9 +45,10 @@ object Settings {
 
     val cats = "2.0.0"
     val fs2 = "2.0.0"
-    val crystal = "0.0.2-SNAPSHOT"
+    val crystal = "0.0.3-SNAPSHOT"
+    val monocle = "2.0.0"
 
-    val scalajsScripts = "1.0.0"
+    val scalajsScripts = "1.1.4"
   }
 
   /**
@@ -74,6 +80,7 @@ object Settings {
     "org.typelevel" %%% "cats-effect" % versions.cats,
     "co.fs2" %%% "fs2-core" % versions.fs2,
     "com.rpiaggio" %%% "crystal" % versions.crystal,
+    "com.github.julien-truffaut" %%  "monocle-core"  % versions.monocle,
     "com.lihaoyi" %%% "utest" % versions.uTest % Test
   ))
 
