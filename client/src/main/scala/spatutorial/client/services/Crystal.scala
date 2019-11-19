@@ -5,8 +5,8 @@ import cats.effect._
 import cats.implicits._
 import autowire._
 import boopickle.Default._
+import cats.Functor
 import fs2.concurrent.SignallingRef
-
 import diode.data._
 
 import scala.concurrent.ExecutionContext
@@ -30,14 +30,31 @@ object Crystal {
     def set(value: A): F[Unit]
   }
 
-  class Slice[F[_] : ConcurrentEffect : Timer, +G[F[_]], M, A](private val model: M, _lens: Lens[M, A], _actions: PowerLens[F, A] => G[F]) {
-    private val ref = SignallingRef.in[SyncIO, F, A](_lens.get(model)).unsafeRunSync()
+  trait FixedLens[A] {
+    def get(): A
+
+    def set(a: A): Unit
+
+    def modifyF[F[_]: Functor](f: A => F[A]): F[Unit]
+
+    def modify(f: A => A): Unit
+  }
+
+  def lensToFixedLens[M, A](lens: Lens[M, A], model: M): FixedLens[A] = new FixedLens[A] {
+    override def get = lens.get(model)
+    override def set(a: A) = lens.set(a)(model)
+    override def modifyF[F[_] : Functor](f: A => F[A]) = lens.modifyF(f)(model).map(_ => ())
+    override def modify(f: A => A) = lens.modify(f)(model)
+  }
+
+  class Slice[F[_] : ConcurrentEffect : Timer, +G[F[_]], A](fixedLens: FixedLens[A], _actions: PowerLens[F, A] => G[F]) {
+    private val ref = SignallingRef.in[SyncIO, F, A](fixedLens.get).unsafeRunSync()
 
     val flow = Flow.flow(ref.discrete)
 
     val lens = new PowerLens[F, A] {
       def set(value: A): F[Unit] = {
-        _lens.set(value)(model)
+        fixedLens.set(value)
         ref.set(value)
       }
     }
@@ -47,8 +64,8 @@ object Crystal {
 
   case class Model[M](rootModel: M) {
 
-    def slice[F[_] : ConcurrentEffect : Timer, G[F[_]], A](lens: Lens[M, A], actions: PowerLens[F, A] => G[F]): Slice[F, G, M, A] =
-      new Slice(rootModel, lens, actions)
+    def slice[F[_] : ConcurrentEffect : Timer, G[F[_]], A](lens: Lens[M, A], actions: PowerLens[F, A] => G[F]): Slice[F, G, A] =
+      new Slice(lensToFixedLens(lens, rootModel), actions)
   }
 
 

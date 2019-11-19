@@ -5,7 +5,7 @@ import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import spatutorial.client.components.Bootstrap._
-import spatutorial.client.services.Crystal.{MotdAlgebra, RootModel, Slice}
+import spatutorial.client.services.Crystal.{MotdAlgebra, Slice}
 import diode.react.ReactPot._
 
 /**
@@ -19,7 +19,7 @@ object Motd2 {
 //  val MotdFlow = Flow.flow(Global.InterpreterIO.Motd.motdStream)
 
   // create the React component for holding the Message of the Day
-  val Motd = ScalaComponent.builder[Slice[IO, MotdAlgebra, RootModel, Pot[String]]]("Motd")
+  val Motd = ScalaComponent.builder[Slice[IO, MotdAlgebra, Pot[String]]]("Motd")
     .render_P { p =>
       Panel(Panel.Props("Message of the day"),
         // render messages depending on the state of the Pot
@@ -49,5 +49,5 @@ object Motd2 {
 //    )
     .build
 
-  def apply(props: Slice[IO, MotdAlgebra, RootModel, Pot[String]]) = Motd(props)
+  def apply(props: Slice[IO, MotdAlgebra, Pot[String]]) = Motd(props)
 }
