@@ -33,12 +33,12 @@ object Settings {
     val scalaCSS = "0.5.3"
     val log4js = "1.4.10"
     val autowire = "0.2.6"
-    val booPickle = "1.2.6"
+    val booPickle = "1.3.1"
     val diode = "1.1.5"
     val diodeReact = "1.1.5.142"
     val uTest = "0.4.7"
 
-    val react = "15.6.1"
+    val react = "16.7.0"
     val jQuery = "1.11.1"
     val bootstrap = "3.3.6"
     val chartjs = "2.1.3"
@@ -65,7 +65,8 @@ object Settings {
     "com.vmunier" %% "scalajs-scripts" % versions.scalajsScripts,
     "org.webjars" % "font-awesome" % "4.3.0-1" % Provided,
     "org.webjars" % "bootstrap" % versions.bootstrap % Provided,
-    "com.lihaoyi" %% "utest" % versions.uTest % Test
+    "com.lihaoyi" %% "utest" % versions.uTest % Test,
+    guice
   ))
 
   /** Dependencies only used by the JS project (note the use of %%% instead of %%) */
@@ -81,13 +82,14 @@ object Settings {
     "co.fs2" %%% "fs2-core" % versions.fs2,
     "com.rpiaggio" %%% "crystal" % versions.crystal,
     "com.github.julien-truffaut" %%  "monocle-core"  % versions.monocle,
+    "com.github.julien-truffaut" %%  "monocle-macro"  % versions.monocle,
     "com.lihaoyi" %%% "utest" % versions.uTest % Test
   ))
 
   /** Dependencies for external JS libs that are bundled into a single .js file according to dependency order */
   val jsDependencies = Def.setting(Seq(
-    "org.webjars.bower" % "react" % versions.react / "react-with-addons.js" minified "react-with-addons.min.js" commonJSName "React",
-    "org.webjars.bower" % "react" % versions.react / "react-dom.js" minified "react-dom.min.js" dependsOn "react-with-addons.js" commonJSName "ReactDOM",
+    "org.webjars.npm" % "react" % versions.react / "umd/react.development.js" minified "umd/react.production.min.js" commonJSName "React",
+    "org.webjars.npm" % "react-dom" % versions.react / "umd/react-dom.development.js" minified "umd/react-dom.production.min.js" dependsOn "umd/react.development.js" commonJSName "ReactDOM",
     "org.webjars" % "jquery" % versions.jQuery / "jquery.js" minified "jquery.min.js",
     "org.webjars" % "bootstrap" % versions.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "jquery.js",
     "org.webjars" % "chartjs" % versions.chartjs / "Chart.js" minified "Chart.min.js",

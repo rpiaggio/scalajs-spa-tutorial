@@ -1,6 +1,7 @@
 package spatutorial.client.services
 
 import diode.data.Pot
+import monocle.macros.Lenses
 
 object Crystal {
 

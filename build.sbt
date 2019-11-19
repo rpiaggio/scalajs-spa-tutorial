@@ -32,6 +32,7 @@ lazy val client: Project = (project in file("client"))
     elideOptions := Seq(),
     scalacOptions ++= elideOptions.value,
     jsDependencies ++= Settings.jsDependencies.value,
+    addCompilerPlugin("org.scalamacros" %% "paradise" % "2.1.1" cross CrossVersion.full), // For @Lenses
     // RuntimeDOM is needed for tests
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv,
     // yes, we want to package JS dependencies

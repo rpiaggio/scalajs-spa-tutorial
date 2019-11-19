@@ -3,14 +3,19 @@
 # ~~~~
 
 # Home page
++ nocsrf
 GET     /                                 controllers.Application.index
 
 # Map static resources from the /public folder to the /assets URL path
++ nocsrf
 GET     /assets/fonts/*file               controllers.Assets.at(path="/public/lib/font-awesome/fonts", file)
++ nocsrf
 GET     /assets/*file                     controllers.Assets.versioned(path="/public", file: Asset)
 
 # Autowire calls
++ nocsrf
 POST    /api/*path                        controllers.Application.autowireApi(path: String)
 
 # Logging
++ nocsrf
 POST /logging                             controllers.Application.logging
