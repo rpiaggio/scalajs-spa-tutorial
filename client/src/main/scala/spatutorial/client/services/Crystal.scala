@@ -54,7 +54,7 @@ object Crystal {
 
   val rootModel = Model(RootModel(Empty, Empty))
 
-  val motdSlice = rootModel.slice(RootModel.motd, {pl: PowerLens[IO, Pot[String]] => MotdAlgebraF[IO](pl)})
+  val motdSlice = rootModel.slice(RootModel.motd, pl => MotdAlgebraF[IO](pl))
 
 
   trait MotdAlgebra[F[_]] {
