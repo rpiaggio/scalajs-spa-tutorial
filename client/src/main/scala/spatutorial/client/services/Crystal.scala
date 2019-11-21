@@ -54,6 +54,10 @@ object Crystal {
 
     val flow = Flow.flow(ref.discrete)
 
+    // TODO Flow with pipe. But it can't be a def. We should use the same flow always in the same slice.
+    // Should it be a parameter of the Slice? A method .sliceWithPipe that creates another flow?
+    // Anyway, not all Slices will have flows.... We can have a .withFlow([pipe]) maybe?
+
     def get: A = fixedLens.get
 
     val lens = new PowerLens[F, A] {
