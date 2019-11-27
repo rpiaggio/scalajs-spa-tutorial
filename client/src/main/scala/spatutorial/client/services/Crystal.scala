@@ -68,6 +68,8 @@ object Crystal {
     }
 
     val actions = _actions(lens)
+
+    def algebra[H[_[_]]](implicit algebra: H[F]): H[F] = algebra
   }
 
   case class Model[M](rootModel: M) {
@@ -79,12 +81,21 @@ object Crystal {
 
   val rootModel = Model(RootModel(Empty, Empty))
 
-  val motdSlice = rootModel.view(RootModel.motd, pl => MotdAlgebraF[IO](pl))
+  val motdView = rootModel.view(RootModel.motd, pl => MotdAlgebraF[IO](pl))
 
 
   trait MotdAlgebra[F[_]] {
     def updateMotd: SyncIO[Unit]
   }
+
+  trait LogAlgebra[F[_]] {
+    def log(msg: String): F[Unit]
+  }
+
+  implicit object IOAlgebra extends LogAlgebra[IO] {
+    def log(msg: String): IO[Unit] = IO(println(msg))
+  }
+
 
   case class MotdAlgebraF[F[_] : Effect](lens: SignallingLens[F, Pot[String]]) extends MotdAlgebra[F] {
     implicit private val ec: ExecutionContext = global
@@ -100,16 +111,28 @@ object Crystal {
     protected def updateMotdRef: F[Unit] =
       for {
         motd <- queryMotd
-        _ <- Effect[F].pure(lens.set(Ready(motd)))
+        _ = println(s"MOTD QUERIED! $motd")
+        _ <- Effect[F].pure{println(s"SETTING LENS: $motd");  lens.set(Ready(motd))}
       } yield ()
 
     def updateMotd: SyncIO[Unit] =
       Effect[F].runAsync(updateMotdRef) {
-        _ => IO.unit // Not Sure how to treat here
+        _ =>
+
+          println("DID RUN ASYNC")
+
+          IO.unit // Not Sure how to treat here
       }
   }
 
   implicit def syncIO2Callback[A](s: SyncIO[A]): Callback  = Callback {
+
+    println("IN IMPLICIT")
+
     s.unsafeRunSync()
+  }
+
+  implicit def io2Callback[A](io: IO[A]): Callback  = Callback {
+    io.unsafeRunAsyncAndForget()
   }
 }

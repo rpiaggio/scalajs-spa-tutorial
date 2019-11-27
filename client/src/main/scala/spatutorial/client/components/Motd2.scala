@@ -4,7 +4,7 @@ import cats.effect.IO
 import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import spatutorial.client.components.Bootstrap._
+import spatutorial.client.components.Bootstrap.{Button, _}
 import spatutorial.client.services.Crystal.{MotdAlgebra, View}
 import diode.react.ReactPot._
 import spatutorial.client.services.Crystal._
@@ -15,9 +15,17 @@ import spatutorial.client.services.Crystal._
 object Motd2 {
   val Motd = ScalaComponent.builder[View[IO, MotdAlgebra, Pot[String]]]("Motd")
     .render_P { p =>
+
+      println(s"THIS IS MOTD2 RENDERING: ${p.get}")
+
       Panel(Panel.Props("Message of the day"),
 
+        "THIS IS MOTD2 RENDERING",
+
         p.flow { motdOpt =>
+
+          println(s"THIS FLOW RENDERING $motdOpt")
+
           val motd = Pot.fromOption(motdOpt).flatten
           <.div(
             motd.renderPending(_ > 500, _ => <.p("Loading...")),
@@ -27,8 +35,12 @@ object Motd2 {
         },
 
         Button(Button.Props(
-          p.actions.updateMotd
-          , CommonStyle.danger), Icon.refresh, " Update")
+          p.actions.updateMotd // This isn't working, flow is not re-rendering :(
+          , CommonStyle.danger), Icon.refresh, " Update"),
+
+          Button(Button.Props(
+          p.algebra[LogAlgebra].log("You logged!")
+          , CommonStyle.danger), Icon.refresh, " Log")
       )
     }
     .componentDidMount(scope =>

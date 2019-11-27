@@ -35,7 +35,7 @@ object SPAMain extends js.JSApp {
     // wrap/connect components to the circuit
     (staticRoute(root, DashboardLoc) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy)))
       | staticRoute("#motd", MotdLoc) ~> render(Motd())
-      | staticRoute("#motd2", MotdLoc) ~> render(Motd2(Crystal.motdSlice))
+      | staticRoute("#motd2", Motd2Loc) ~> render(Motd2(Crystal.motdView))
 //      | staticRoute("#todo", TodoLoc) ~> renderR(ctl => todoWrapper(Todo(_)))
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
   }.renderWith(layout)
