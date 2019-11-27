@@ -28,7 +28,7 @@ object Crystal {
   @Lenses
   case class RootModel(todos: Pot[Todos], motd: Pot[String])
 
-  trait PowerLens[F[_], A] {
+  trait SignallingLens[F[_], A] {
     def set(value: A): F[Unit]
   }
 
@@ -49,7 +49,7 @@ object Crystal {
     override def modify(f: A => A) = lens.modify(f)(model)
   }
 
-  class Slice[F[_] : ConcurrentEffect : Timer, +G[F[_]], A](fixedLens: FixedLens[A], _actions: PowerLens[F, A] => G[F]) {
+  class View[F[_] : ConcurrentEffect : Timer, +G[F[_]], A](fixedLens: FixedLens[A], _actions: SignallingLens[F, A] => G[F]) {
     private val ref = SignallingRef.in[SyncIO, F, A](fixedLens.get).unsafeRunSync()
 
     val flow = Flow.flow(ref.discrete)
@@ -60,7 +60,7 @@ object Crystal {
 
     def get: A = fixedLens.get
 
-    val lens = new PowerLens[F, A] {
+    val lens = new SignallingLens[F, A] {
       def set(value: A): F[Unit] = {
         fixedLens.set(value)
         ref.set(value)
@@ -72,21 +72,21 @@ object Crystal {
 
   case class Model[M](rootModel: M) {
 
-    def slice[F[_] : ConcurrentEffect : Timer, G[F[_]], A](lens: Lens[M, A], actions: PowerLens[F, A] => G[F]): Slice[F, G, A] =
-      new Slice(lensToFixedLens(lens, rootModel), actions)
+    def view[F[_] : ConcurrentEffect : Timer, G[F[_]], A](lens: Lens[M, A], actions: SignallingLens[F, A] => G[F]): View[F, G, A] =
+      new View(lensToFixedLens(lens, rootModel), actions)
   }
 
 
   val rootModel = Model(RootModel(Empty, Empty))
 
-  val motdSlice = rootModel.slice(RootModel.motd, pl => MotdAlgebraF[IO](pl))
+  val motdSlice = rootModel.view(RootModel.motd, pl => MotdAlgebraF[IO](pl))
 
 
   trait MotdAlgebra[F[_]] {
     def updateMotd: SyncIO[Unit]
   }
 
-  case class MotdAlgebraF[F[_] : Effect](lens: PowerLens[F, Pot[String]]) extends MotdAlgebra[F] {
+  case class MotdAlgebraF[F[_] : Effect](lens: SignallingLens[F, Pot[String]]) extends MotdAlgebra[F] {
     implicit private val ec: ExecutionContext = global
 
     protected def queryMotd: F[String] =

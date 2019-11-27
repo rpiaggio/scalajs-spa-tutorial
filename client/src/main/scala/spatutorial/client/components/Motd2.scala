@@ -5,7 +5,7 @@ import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import spatutorial.client.components.Bootstrap._
-import spatutorial.client.services.Crystal.{MotdAlgebra, Slice}
+import spatutorial.client.services.Crystal.{MotdAlgebra, View}
 import diode.react.ReactPot._
 import spatutorial.client.services.Crystal._
 
@@ -13,7 +13,7 @@ import spatutorial.client.services.Crystal._
  * This is a simple component demonstrating how to display async data coming from the server
  */
 object Motd2 {
-  val Motd = ScalaComponent.builder[Slice[IO, MotdAlgebra, Pot[String]]]("Motd")
+  val Motd = ScalaComponent.builder[View[IO, MotdAlgebra, Pot[String]]]("Motd")
     .render_P { p =>
       Panel(Panel.Props("Message of the day"),
 
@@ -37,5 +37,5 @@ object Motd2 {
     )
     .build
 
-  def apply(props: Slice[IO, MotdAlgebra, Pot[String]]) = Motd(props)
+  def apply(props: View[IO, MotdAlgebra, Pot[String]]) = Motd(props)
 }
