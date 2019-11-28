@@ -63,6 +63,9 @@ object Crystal {
     val lens = new SignallingLens[F, A] {
       def set(value: A): F[Unit] = {
         fixedLens.set(value)
+
+        println(s"SETTING REF TO [$value]")
+
         ref.set(value)
       }
     }
@@ -112,7 +115,7 @@ object Crystal {
       for {
         motd <- queryMotd
         _ = println(s"MOTD QUERIED! $motd")
-        _ <- Effect[F].pure{println(s"SETTING LENS: $motd");  lens.set(Ready(motd))}
+        _ <- lens.set(Ready(motd))
       } yield ()
 
     def updateMotd: SyncIO[Unit] =

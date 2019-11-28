@@ -28,15 +28,17 @@ object Motd {
       Panel(Panel.Props("Message of the day"),
         // render messages depending on the state of the Pot
 
-        MotdFlow( motd =>
+        MotdFlow { motd =>
+
+          println(s"THIS FLOW RENDERING $motd")
 
           motd.fold(<.p("Loading..."))(msg => <.p(msg))
 
-//        proxy().renderPending(_ > 500, _ => <.p("Loading...")),
-//        proxy().renderFailed(ex => <.p("Failed to load")),
-//        proxy().render(m => <.p(m)),
+          //        proxy().renderPending(_ > 500, _ => <.p("Loading...")),
+          //        proxy().renderFailed(ex => <.p("Failed to load")),
+          //        proxy().render(m => <.p(m)),
 
-        ),
+        },
 
 
         Button(Button.Props(
