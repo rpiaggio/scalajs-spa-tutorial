@@ -6,7 +6,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import spatutorial.client.components.Bootstrap.{Button, _}
 import crystal._
-import spatutorial.client.services.AppState.{MotdAlgebra, _}
+import spatutorial.client.services.Algebras._
 import diode.react.ReactPot._
 
 /**
@@ -19,13 +19,7 @@ object Motd2 {
       println(s"THIS IS MOTD2 RENDERING: ${p.get}")
 
       Panel(Panel.Props("Message of the day"),
-
-        "THIS IS MOTD2 RENDERING",
-
         p.flow { motdOpt =>
-
-          println(s"THIS FLOW RENDERING $motdOpt")
-
           val motd = Pot.fromOption(motdOpt).flatten
           <.div(
             motd.renderPending(_ > 500, _ => <.p("Loading...")),
