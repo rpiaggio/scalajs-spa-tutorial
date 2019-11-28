@@ -16,8 +16,6 @@ object Motd2 {
   val Motd = ScalaComponent.builder[View[IO, Pot[String]]]("Motd")
     .render_P { p =>
 
-      println(s"THIS IS MOTD2 RENDERING: ${p.get}")
-
       Panel(Panel.Props("Message of the day"),
         p.flow { motdOpt =>
           val motd = Pot.fromOption(motdOpt).flatten
@@ -41,7 +39,7 @@ object Motd2 {
       //       update only if Motd is empty
       scope.props.get.flatMap { motdPot =>
         if(motdPot.isEmpty)
-          scope.props.algebra[MotdAlgebra].updateMotd.to[IO]
+          scope.props.algebra[MotdAlgebra].updateMotd
         else
           IO.unit
       }

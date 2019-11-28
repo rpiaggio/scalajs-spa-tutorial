@@ -27,6 +27,8 @@ object SPAMain extends js.JSApp {
 
   case object TodoLoc extends Loc
 
+  case object Todo2Loc extends Loc
+
   // configure the router
   val routerConfig = RouterConfigDsl[Loc].buildConfig { dsl =>
     import dsl._
@@ -37,6 +39,7 @@ object SPAMain extends js.JSApp {
       | staticRoute("#motd", MotdLoc) ~> render(Motd())
       | staticRoute("#motd2", Motd2Loc) ~> render(Motd2(AppState.motdView))
 //      | staticRoute("#todo", TodoLoc) ~> renderR(ctl => todoWrapper(Todo(_)))
+      | staticRoute("#todo2", Todo2Loc) ~> render(Todo2(AppState.todosView))
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
   }.renderWith(layout)
 
