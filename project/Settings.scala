@@ -45,7 +45,7 @@ object Settings {
 
     val cats = "2.0.0"
     val fs2 = "2.0.0"
-    val crystal = "0.0.3-SNAPSHOT"
+    //val crystal = "0.0.3-SNAPSHOT" // For the moment crystal is being developed here. It will eventually be its own project.
     val monocle = "2.0.0"
 
     val scalajsScripts = "1.1.4"
@@ -80,7 +80,7 @@ object Settings {
     "org.typelevel" %%% "cats-core" % versions.cats,
     "org.typelevel" %%% "cats-effect" % versions.cats,
     "co.fs2" %%% "fs2-core" % versions.fs2,
-    "com.rpiaggio" %%% "crystal" % versions.crystal,
+    // "com.rpiaggio" %%% "crystal" % versions.crystal, // For the moment crystal is being developed here.
     "com.github.julien-truffaut" %%  "monocle-core"  % versions.monocle,
     "com.github.julien-truffaut" %%  "monocle-macro"  % versions.monocle,
     "com.lihaoyi" %%% "utest" % versions.uTest % Test

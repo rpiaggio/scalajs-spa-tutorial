@@ -1,5 +1,7 @@
 package spatutorial.client.services
 
+object Algebras
+/*
 import spatutorial.shared.Api
 import cats.effect._
 import cats.implicits._
@@ -65,3 +67,4 @@ object Global {
   object InterpreterIO extends Interpreter[IO]
 
 }
+*/

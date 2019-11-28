@@ -6,7 +6,7 @@ import org.scalajs.dom
 import spatutorial.client.components.{GlobalStyles, Motd, Motd2}
 import spatutorial.client.logger._
 import spatutorial.client.modules._
-import spatutorial.client.services.{Crystal, SPACircuit}
+import spatutorial.client.services.{AppState, SPACircuit}
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
@@ -35,7 +35,7 @@ object SPAMain extends js.JSApp {
     // wrap/connect components to the circuit
     (staticRoute(root, DashboardLoc) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy)))
       | staticRoute("#motd", MotdLoc) ~> render(Motd())
-      | staticRoute("#motd2", Motd2Loc) ~> render(Motd2(Crystal.motdView))
+      | staticRoute("#motd2", Motd2Loc) ~> render(Motd2(AppState.motdView))
 //      | staticRoute("#todo", TodoLoc) ~> renderR(ctl => todoWrapper(Todo(_)))
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
   }.renderWith(layout)

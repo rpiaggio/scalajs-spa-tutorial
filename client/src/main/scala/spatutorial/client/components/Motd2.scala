@@ -5,15 +5,15 @@ import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import spatutorial.client.components.Bootstrap.{Button, _}
-import spatutorial.client.services.Crystal.{MotdAlgebra, View}
+import crystal._
+import spatutorial.client.services.AppState.{MotdAlgebra, _}
 import diode.react.ReactPot._
-import spatutorial.client.services.Crystal._
 
 /**
  * This is a simple component demonstrating how to display async data coming from the server
  */
 object Motd2 {
-  val Motd = ScalaComponent.builder[View[IO, MotdAlgebra, Pot[String]]]("Motd")
+  val Motd = ScalaComponent.builder[View[IO, Pot[String]]]("Motd")
     .render_P { p =>
 
       println(s"THIS IS MOTD2 RENDERING: ${p.get}")
@@ -35,19 +35,24 @@ object Motd2 {
         },
 
         Button(Button.Props(
-          p.actions.updateMotd // This isn't working, flow is not re-rendering :(
+          p.algebra[MotdAlgebra].updateMotd
           , CommonStyle.danger), Icon.refresh, " Update"),
 
           Button(Button.Props(
-          p.algebra[LogAlgebra].log("You logged!")
+            p.get.flatMap(motd => p.algebra[LogAlgebra].log(s"You logged [$motd]!"))
           , CommonStyle.danger), Icon.refresh, " Log")
       )
     }
     .componentDidMount(scope =>
       //       update only if Motd is empty
-      Callback.when(scope.props.get.isEmpty)(scope.props.actions.updateMotd)
+      scope.props.get.flatMap { motdPot =>
+        if(motdPot.isEmpty)
+          scope.props.algebra[MotdAlgebra].updateMotd.to[IO]
+        else
+          IO.unit
+      }
     )
     .build
 
-  def apply(props: View[IO, MotdAlgebra, Pot[String]]) = Motd(props)
+  def apply(props: View[IO, Pot[String]]) = Motd(props)
 }
