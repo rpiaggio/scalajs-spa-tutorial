@@ -1,11 +1,12 @@
 package crystal
 
 import cats.effect.{ConcurrentEffect, SyncIO, Timer}
+import cats.implicits._
 import fs2.concurrent.SignallingRef
 
 import scala.language.higherKinds
 
-class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initialValue: A) {
+class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initialValue: A, updateModel: A => F[Unit]) {
   private val ref = SignallingRef.in[SyncIO, F, A](initialValue).unsafeRunSync()
 
   val flow = Flow.flow(ref.discrete)
@@ -18,8 +19,7 @@ class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initi
 
   val lens = new SignallingLens[F, A] {
     def set(value: A): F[Unit] = {
-      fixedLens.set(value)
-      ref.set(value)
+      updateModel(value) *> ref.set(value)
     }
   }
 

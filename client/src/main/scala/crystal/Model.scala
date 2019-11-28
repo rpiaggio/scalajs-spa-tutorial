@@ -11,5 +11,5 @@ case class Model[F[_] : ConcurrentEffect : Timer, M](initialModel: M) {
   val modelRef: Ref[F, M] = Ref.unsafe[F, M](initialModel)
 
   def view[A](lens: Lens[M, A]): View[F, A] =
-    new View(FixedLens.fromLensAndModelRef(lens, modelRef), lens.get(initialModel))
+    new View(FixedLens.fromLensAndModelRef(lens, modelRef), lens.get(initialModel), a => modelRef.update(lens.set(a)))
 }
