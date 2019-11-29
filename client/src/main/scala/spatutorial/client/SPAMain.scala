@@ -3,18 +3,17 @@ package spatutorial.client
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom
-import spatutorial.client.components.{GlobalStyles, Motd, Motd2}
+import spatutorial.client.components.{GlobalStyles, Motd}
 import spatutorial.client.logger._
 import spatutorial.client.modules._
 import spatutorial.client.services.{AppState, SPACircuit}
 
-import scala.scalajs.js
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import CssSettings._
 import scalacss.ScalaCssReact._
 
 @JSExportTopLevel("SPAMain")
-object SPAMain extends js.JSApp {
+object SPAMain {
 
   // Define the locations (pages) used in this application
   sealed trait Loc
@@ -23,11 +22,7 @@ object SPAMain extends js.JSApp {
 
   case object MotdLoc extends Loc
 
-  case object Motd2Loc extends Loc
-
   case object TodoLoc extends Loc
-
-  case object Todo2Loc extends Loc
 
   // configure the router
   val routerConfig = RouterConfigDsl[Loc].buildConfig { dsl =>
@@ -36,10 +31,8 @@ object SPAMain extends js.JSApp {
 //    val todoWrapper = SPACircuit.connect(_.todos)
     // wrap/connect components to the circuit
     (staticRoute(root, DashboardLoc) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy)))
-      | staticRoute("#motd", MotdLoc) ~> render(Motd())
-      | staticRoute("#motd2", Motd2Loc) ~> render(Motd2(AppState.motdView))
-//      | staticRoute("#todo", TodoLoc) ~> renderR(ctl => todoWrapper(Todo(_)))
-      | staticRoute("#todo2", Todo2Loc) ~> render(Todo2(AppState.todosView))
+      | staticRoute("#motd2", MotdLoc) ~> render(Motd(AppState.motdView))
+      | staticRoute("#todo2", TodoLoc) ~> render(Todo(AppState.todosView))
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
   }.renderWith(layout)
 
@@ -64,7 +57,7 @@ object SPAMain extends js.JSApp {
   }
 
   @JSExport
-  def main(): Unit = {
+  def main(args: Array[String]): Unit = {
     log.warn("Application starting")
     // send log messages also to the server
     log.enableServerLogging("/logging")

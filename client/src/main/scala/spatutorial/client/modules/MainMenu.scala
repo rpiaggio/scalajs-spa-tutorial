@@ -4,19 +4,27 @@ import diode.react.ModelProxy
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
+import react.common.ReactProps
 import spatutorial.client.SPAMain.{DashboardLoc, Loc, TodoLoc}
 import spatutorial.client.components.Bootstrap.CommonStyle
 import spatutorial.client.components.Icon._
 import spatutorial.client.components._
 import spatutorial.client.services._
-
 import scalacss.ScalaCssReact._
+
+case class MainMenu(
+  router: RouterCtl[Loc],
+  currentLoc: Loc,
+  proxy: ModelProxy[Option[Int]]
+) extends ReactProps {
+  @inline def render: VdomElement = MainMenu.component(this)
+}
 
 object MainMenu {
   // shorthand for styles
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-  case class Props(router: RouterCtl[Loc], currentLoc: Loc, proxy: ModelProxy[Option[Int]])
+  type Props = MainMenu
 
   private case class MenuItem(idx: Int, label: (Props) => VdomNode, icon: Icon, location: Loc)
 
@@ -34,7 +42,7 @@ object MainMenu {
     MenuItem(2, buildTodoMenu, Icon.check, TodoLoc)
   )
 
-  private class Backend($: BackendScope[Props, Unit]) {
+  protected class Backend($: BackendScope[Props, Unit]) {
     def mounted(props: Props) =
       // dispatch a message to refresh the todos
       Callback.when(props.proxy.value.isEmpty)(props.proxy.dispatchCB(RefreshTodos))
@@ -50,11 +58,8 @@ object MainMenu {
     }
   }
 
-  private val component = ScalaComponent.builder[Props]("MainMenu")
+  val component = ScalaComponent.builder[Props]("MainMenu")
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.mounted(scope.props))
     .build
-
-  def apply(ctl: RouterCtl[Loc], currentLoc: Loc, proxy: ModelProxy[Option[Int]]): VdomElement =
-    component(Props(ctl, currentLoc, proxy))
 }

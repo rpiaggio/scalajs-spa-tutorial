@@ -31,6 +31,7 @@ object Settings {
     val scalaDom = "0.9.3"
     val scalajsReact = "1.4.2"
     val scalaCSS = "0.5.3"
+    val scalajsReactCommon = "0.3.2"
     val log4js = "1.4.10"
     val autowire = "0.2.6"
     val booPickle = "1.3.1"
@@ -74,6 +75,7 @@ object Settings {
     "com.github.japgolly.scalajs-react" %%% "core" % versions.scalajsReact,
     "com.github.japgolly.scalajs-react" %%% "extra" % versions.scalajsReact,
     "com.github.japgolly.scalacss" %%% "ext-react" % versions.scalaCSS,
+    "io.github.cquiroz.react" %%% "common" % versions.scalajsReactCommon,
     "io.suzaku" %%% "diode" % versions.diode,
     "io.suzaku" %%% "diode-react" % versions.diodeReact,
     "org.scala-js" %%% "scalajs-dom" % versions.scalaDom,

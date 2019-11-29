@@ -1,23 +1,30 @@
 package spatutorial.client.components
 
+import cats.effect.IO
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
-import spatutorial.client.components.Bootstrap.{CommonStyle, Button}
-import spatutorial.shared._
 import scalacss.ScalaCssReact._
+import spatutorial.client.components.Bootstrap.{Button, CommonStyle}
+import spatutorial.shared._
+import crystal._
+import react.common.ReactProps
+
+final case class TodoList(
+  items: Seq[TodoItem],
+  stateChange: TodoItem => IO[Unit],
+  editItem: TodoItem => IO[Unit],
+  deleteItem: TodoItem => IO[Unit]
+) extends ReactProps {
+  @inline def render: VdomElement = TodoList.component(this)
+}
 
 object TodoList {
+  type Props = TodoList
+
   // shorthand for styles
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-  case class TodoListProps(
-    items: Seq[TodoItem],
-    stateChange: TodoItem => Callback,
-    editItem: TodoItem => Callback,
-    deleteItem: TodoItem => Callback
-  )
-
-  private val TodoList = ScalaComponent.builder[TodoListProps]("TodoList")
+  val component = ScalaComponent.builder[Props]("TodoList2")
     .render_P(p => {
       val style = bss.listGroup
       def renderItem(item: TodoItem) = {
@@ -31,14 +38,11 @@ object TodoList {
           <.input.checkbox(^.checked := item.completed, ^.onChange --> p.stateChange(item.copy(completed = !item.completed))),
           <.span(" "),
           if (item.completed) <.s(item.content) else <.span(item.content),
-          Button(Button.Props(p.editItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Edit"),
-          Button(Button.Props(p.deleteItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS)), "Delete")
+          Button(p.editItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS))("Edit"),
+          Button(p.deleteItem(item), addStyles = Seq(bss.pullRight, bss.buttonXS))("Delete")
         )
       }
       <.ul(style.listGroup)(p.items toTagMod renderItem)
     })
     .build
-
-  def apply(items: Seq[TodoItem], stateChange: TodoItem => Callback, editItem: TodoItem => Callback, deleteItem: TodoItem => Callback) =
-    TodoList(TodoListProps(items, stateChange, editItem, deleteItem))
 }

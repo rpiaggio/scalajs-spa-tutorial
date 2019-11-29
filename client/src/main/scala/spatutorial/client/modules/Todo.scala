@@ -1,7 +1,7 @@
 package spatutorial.client.modules
 
+import cats.effect.IO
 import diode.react.ReactPot._
-import diode.react._
 import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -10,92 +10,120 @@ import spatutorial.client.components._
 import spatutorial.client.logger._
 import spatutorial.client.services._
 import spatutorial.shared._
-
+import crystal._
+import react.common.ReactProps
 import scalacss.ScalaCssReact._
+import spatutorial.client.services.Algebras.{LogAlgebra, TodoAlgebra}
+
+final case class Todo(view: View[IO, Pot[Todos]]) extends ReactProps {
+  @inline def render: VdomElement = Todo.component(this)
+}
 
 object Todo {
-
-  case class Props(proxy: ModelProxy[Pot[Todos]])
+  type Props = Todo
 
   case class State(selectedItem: Option[TodoItem] = None, showTodoForm: Boolean = false)
 
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
-      // dispatch a message to refresh the todos, which will cause TodoStore to fetch todos from the server
-      Callback.when(props.proxy().isEmpty)(props.proxy.dispatchCB(RefreshTodos))
+    // dispatch a message to refresh the todos, which will cause TodoStore to fetch todos from the server
+      props.view.get.flatMap { todosPot =>
+        if (todosPot.isEmpty)
+          props.view.algebra[TodoAlgebra].refreshTodos()
+        else
+          IO.unit
+      }
 
     def editTodo(item: Option[TodoItem]) =
-      // activate the edit dialog
-      $.modState(s => s.copy(selectedItem = item, showTodoForm = true))
+    // activate the edit dialog
+      $.modStateIO(s => s.copy(selectedItem = item, showTodoForm = true))
 
-    def todoEdited(item: TodoItem, cancelled: Boolean) = {
-      val cb = if (cancelled) {
-        // nothing to do here
-        Callback.log("Todo editing cancelled")
+    def todoEdited(item: TodoItem, cancelled: Boolean): IO[Unit] = {
+      val io = if (cancelled) {
+        for {
+          p <- $.propsIO
+          _ <- p.view.algebra[LogAlgebra].log("Todo editing cancelled")
+        } yield ()
       } else {
-        Callback.log(s"Todo edited: $item") >>
-          $.props >>= (_.proxy.dispatchCB(UpdateTodo(item)))
+        for {
+          p <- $.propsIO
+          _ <- p.view.algebra[LogAlgebra].log(s"Todo edited: $item")
+          _ <- p.view.algebra[TodoAlgebra].updateTodo(item)
+        } yield ()
       }
-      // hide the edit dialog, chain callbacks
-      cb >> $.modState(s => s.copy(showTodoForm = false))
+      // hide the edit dialog, chain IOs
+      io.flatMap(_ => $.modStateIO(s => s.copy(showTodoForm = false)))
     }
 
     def render(p: Props, s: State) =
-      Panel(Panel.Props("What needs to be done"), <.div(
-        p.proxy().renderFailed(ex => "Error loading"),
-        p.proxy().renderPending(_ > 500, _ => "Loading..."),
-        p.proxy().render(todos => TodoList(todos.items, item => p.proxy.dispatchCB(UpdateTodo(item)),
-          item => editTodo(Some(item)), item => p.proxy.dispatchCB(DeleteTodo(item)))),
-        Button(Button.Props(editTodo(None)), Icon.plusSquare, " New")),
+      Panel(Panel.Props("What needs to be done"),
+        p.view.flow { todosOpt =>
+          val todos = Pot.fromOption(todosOpt).flatten
+          <.div(
+            todos.renderFailed(ex => "Error loading"),
+            todos.renderPending(_ > 500, _ => "Loading..."),
+            todos.render(todos => TodoList(todos.items,
+              item => p.view.algebra[TodoAlgebra].updateTodo(item),
+              item => editTodo(Some(item)),
+              item => p.view.algebra[TodoAlgebra].deleteTodo(item))),
+            Button(editTodo(None))(Icon.plusSquare, " New")
+          )
+        },
+
+
         // if the dialog is open, add it to the panel
-        if (s.showTodoForm) TodoForm(TodoForm.Props(s.selectedItem, todoEdited))
+        if (s.showTodoForm) TodoForm(s.selectedItem, todoEdited)
         else // otherwise add an empty placeholder
           VdomArray.empty())
   }
 
   // create the React component for To Do management
-  val component = ScalaComponent.builder[Props]("TODO")
+  val component = ScalaComponent.builder[Props]("Todo")
     .initialState(State()) // initial state from TodoStore
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.mounted(scope.props))
     .build
+}
 
-  /** Returns a function compatible with router location system while using our own props */
-  def apply(proxy: ModelProxy[Pot[Todos]]) = component(Props(proxy))
+final case class TodoForm(
+  item: Option[TodoItem],
+  submitHandler: (TodoItem, Boolean) => IO[Unit]
+) extends ReactProps {
+  @inline def render: VdomElement = TodoForm.component(this)
 }
 
 object TodoForm {
   // shorthand for styles
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-  case class Props(item: Option[TodoItem], submitHandler: (TodoItem, Boolean) => Callback)
+  type Props = TodoForm
 
   case class State(item: TodoItem, cancelled: Boolean = true)
 
   class Backend(t: BackendScope[Props, State]) {
-    def submitForm(): Callback = {
+    def submitForm(): IO[Unit] = {
       // mark it as NOT cancelled (which is the default)
-      t.modState(s => s.copy(cancelled = false))
+      t.modStateIO(s => s.copy(cancelled = false))
     }
 
-    def formClosed(state: State, props: Props): Callback =
-      // call parent handler with the new item and whether form was OK or cancelled
+    def formClosed(state: State, props: Props): IO[Unit] =
+    // call parent handler with the new item and whether form was OK or cancelled
       props.submitHandler(state.item, state.cancelled)
 
-    def updateDescription(e: ReactEventFromInput) = {
+    def updateDescription(e: ReactEventFromInput): IO[Unit] = {
       val text = e.target.value
       // update TodoItem content
-      t.modState(s => s.copy(item = s.item.copy(content = text)))
+      t.modStateIO(s => s.copy(item = s.item.copy(content = text)))
     }
 
-    def updatePriority(e: ReactEventFromInput) = {
+    def updatePriority(e: ReactEventFromInput): IO[Unit] = {
       // update TodoItem priority
       val newPri = e.currentTarget.value match {
         case p if p == TodoHigh.toString => TodoHigh
         case p if p == TodoNormal.toString => TodoNormal
         case p if p == TodoLow.toString => TodoLow
       }
-      t.modState(s => s.copy(item = s.item.copy(priority = newPri)))
+      t.modStateIO(s => s.copy(item = s.item.copy(priority = newPri)))
     }
 
     def render(p: Props, s: State) = {
@@ -105,7 +133,7 @@ object TodoForm {
         // header contains a cancel button (X)
         header = hide => <.span(<.button(^.tpe := "button", bss.close, ^.onClick --> hide, Icon.close), <.h4(headerText)),
         // footer has the OK button that submits the form before hiding it
-        footer = hide => <.span(Button(Button.Props(submitForm() >> hide), "OK")),
+        footer = hide => <.span(Button(submitForm() >> hide)("OK")),
         // this is called after the modal has been hidden (animation is completed)
         closed = formClosed(s, p)),
         <.div(bss.formGroup,
@@ -129,6 +157,4 @@ object TodoForm {
     .initialStateFromProps(p => State(p.item.getOrElse(TodoItem("", 0, "", TodoNormal, completed = false))))
     .renderBackend[Backend]
     .build
-
-  def apply(props: Props) = component(props)
 }

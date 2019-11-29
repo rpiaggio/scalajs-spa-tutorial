@@ -8,6 +8,8 @@ import scala.scalajs.js
 import scalacss.ScalaCssReact._
 import spatutorial.client.CssSettings._
 
+import react.common._
+
 /**
  * Common Bootstrap components for scalajs-react
  */
@@ -29,17 +31,21 @@ object Bootstrap {
     val default, primary, success, info, warning, danger = Value
   }
 
-  object Button {
+  final case class Button(
+    onClick: Callback,
+    style: CommonStyle.Value = CommonStyle.default,
+    addStyles: Seq[StyleA] = Seq()
+  ) extends ReactPropsWithChildren {
+    @inline def render: Seq[CtorType.ChildArg] => VdomElement = Button.component(this)
+  }
 
-    case class Props(onClick: Callback, style: CommonStyle.Value = CommonStyle.default, addStyles: Seq[StyleA] = Seq())
+  object Button {
+    type Props = Button
 
     val component = ScalaComponent.builder[Props]("Button")
       .renderPC((_, p, c) =>
         <.button(bss.buttonOpt(p.style), p.addStyles.toTagMod, ^.tpe := "button", ^.onClick --> p.onClick, c)
       ).build
-
-    def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
-    def apply() = component
   }
 
   object Panel {
