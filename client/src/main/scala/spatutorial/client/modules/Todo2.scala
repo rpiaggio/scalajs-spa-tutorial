@@ -2,7 +2,6 @@ package spatutorial.client.modules
 
 import cats.effect.IO
 import diode.react.ReactPot._
-import diode.react._
 import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
@@ -13,7 +12,7 @@ import spatutorial.client.services._
 import spatutorial.shared._
 import crystal._
 import scalacss.ScalaCssReact._
-import spatutorial.client.services.Algebras.{MotdAlgebra, TodoAlgebra}
+import spatutorial.client.services.Algebras.{LogAlgebra, TodoAlgebra}
 
 object Todo2 {
 
@@ -25,7 +24,7 @@ object Todo2 {
     def mounted(props: Props) =
     // dispatch a message to refresh the todos, which will cause TodoStore to fetch todos from the server
       props.view.get.flatMap { todosPot =>
-        if(todosPot.isEmpty)
+        if (todosPot.isEmpty)
           props.view.algebra[TodoAlgebra].refreshTodos()
         else
           IO.unit
@@ -33,18 +32,23 @@ object Todo2 {
 
     def editTodo(item: Option[TodoItem]) =
     // activate the edit dialog
-      $.modState(s => s.copy(selectedItem = item, showTodoForm = true))
+      $.modStateIO(s => s.copy(selectedItem = item, showTodoForm = true))
 
-    def todoEdited(item: TodoItem, cancelled: Boolean) = {
-      val cb = if (cancelled) {
-        // nothing to do here
-        Callback.log("Todo editing cancelled")
+    def todoEdited(item: TodoItem, cancelled: Boolean): IO[Unit] = {
+      val io = if (cancelled) {
+        for {
+          p <- $.propsIO
+          _ <- p.view.algebra[LogAlgebra].log("Todo editing cancelled")
+        } yield ()
       } else {
-        Callback.log(s"Todo edited: $item") >>
-          $.props >>= (_.view.algebra[TodoAlgebra].updateTodo(item))
+        for {
+          p <- $.propsIO
+          _ <- p.view.algebra[LogAlgebra].log(s"Todo edited: $item")
+          _ <- p.view.algebra[TodoAlgebra].updateTodo(item)
+        } yield ()
       }
-      // hide the edit dialog, chain callbacks
-      cb >> $.modState(s => s.copy(showTodoForm = false))
+      // hide the edit dialog, chain IOs
+      io.flatMap(_ => $.modStateIO(s => s.copy(showTodoForm = false)))
     }
 
     def render(p: Props, s: State) =
@@ -57,15 +61,17 @@ object Todo2 {
           <.div(
             todos.renderFailed(ex => "Error loading"),
             todos.renderPending(_ > 500, _ => "Loading..."),
-            todos.render(todos => TodoList(todos.items, item => p.view.algebra[TodoAlgebra].updateTodo(item),
-              item => editTodo(Some(item)), item => p.view.algebra[TodoAlgebra].deleteTodo(item))),
+            todos.render(todos => TodoList2(todos.items,
+              item => p.view.algebra[TodoAlgebra].updateTodo(item),
+              item => editTodo(Some(item)),
+              item => p.view.algebra[TodoAlgebra].deleteTodo(item))),
             Button(Button.Props(editTodo(None)), Icon.plusSquare, " New")
           )
         },
 
 
         // if the dialog is open, add it to the panel
-        if (s.showTodoForm) TodoForm(TodoForm.Props(s.selectedItem, todoEdited))
+        if (s.showTodoForm) TodoForm2(TodoForm2.Props(s.selectedItem, todoEdited))
         else // otherwise add an empty placeholder
           VdomArray.empty())
   }
@@ -85,34 +91,34 @@ object TodoForm2 {
   // shorthand for styles
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-  case class Props(item: Option[TodoItem], submitHandler: (TodoItem, Boolean) => Callback)
+  case class Props(item: Option[TodoItem], submitHandler: (TodoItem, Boolean) => IO[Unit])
 
   case class State(item: TodoItem, cancelled: Boolean = true)
 
   class Backend(t: BackendScope[Props, State]) {
-    def submitForm(): Callback = {
+    def submitForm(): IO[Unit] = {
       // mark it as NOT cancelled (which is the default)
-      t.modState(s => s.copy(cancelled = false))
+      t.modStateIO(s => s.copy(cancelled = false))
     }
 
-    def formClosed(state: State, props: Props): Callback =
+    def formClosed(state: State, props: Props): IO[Unit] =
     // call parent handler with the new item and whether form was OK or cancelled
       props.submitHandler(state.item, state.cancelled)
 
-    def updateDescription(e: ReactEventFromInput) = {
+    def updateDescription(e: ReactEventFromInput): IO[Unit] = {
       val text = e.target.value
       // update TodoItem content
-      t.modState(s => s.copy(item = s.item.copy(content = text)))
+      t.modStateIO(s => s.copy(item = s.item.copy(content = text)))
     }
 
-    def updatePriority(e: ReactEventFromInput) = {
+    def updatePriority(e: ReactEventFromInput): IO[Unit] = {
       // update TodoItem priority
       val newPri = e.currentTarget.value match {
         case p if p == TodoHigh.toString => TodoHigh
         case p if p == TodoNormal.toString => TodoNormal
         case p if p == TodoLow.toString => TodoLow
       }
-      t.modState(s => s.copy(item = s.item.copy(priority = newPri)))
+      t.modStateIO(s => s.copy(item = s.item.copy(priority = newPri)))
     }
 
     def render(p: Props, s: State) = {

@@ -1,10 +1,12 @@
 package spatutorial.client.components
 
+import cats.effect.IO
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import scalacss.ScalaCssReact._
 import spatutorial.client.components.Bootstrap.{Button, CommonStyle}
 import spatutorial.shared._
+import crystal._
 
 object TodoList2 {
   // shorthand for styles
@@ -12,12 +14,12 @@ object TodoList2 {
 
   case class TodoListProps(
     items: Seq[TodoItem],
-    stateChange: TodoItem => Callback,
-    editItem: TodoItem => Callback,
-    deleteItem: TodoItem => Callback
+    stateChange: TodoItem => IO[Unit],
+    editItem: TodoItem => IO[Unit],
+    deleteItem: TodoItem => IO[Unit]
   )
 
-  private val TodoList = ScalaComponent.builder[TodoListProps]("TodoList")
+  private val TodoList = ScalaComponent.builder[TodoListProps]("TodoList2")
     .render_P(p => {
       val style = bss.listGroup
       def renderItem(item: TodoItem) = {
@@ -39,6 +41,6 @@ object TodoList2 {
     })
     .build
 
-  def apply(items: Seq[TodoItem], stateChange: TodoItem => Callback, editItem: TodoItem => Callback, deleteItem: TodoItem => Callback) =
+  def apply(items: Seq[TodoItem], stateChange: TodoItem => IO[Unit], editItem: TodoItem => IO[Unit], deleteItem: TodoItem => IO[Unit]) =
     TodoList(TodoListProps(items, stateChange, editItem, deleteItem))
 }
