@@ -48,9 +48,15 @@ object Bootstrap {
       ).build
   }
 
-  object Panel {
+  final case class Panel(
+    heading: String,
+    style: CommonStyle.Value = CommonStyle.default
+  ) extends ReactPropsWithChildren {
+    @inline def render: Seq[CtorType.ChildArg] => VdomElement = Panel.component(this)
+  }
 
-    case class Props(heading: String, style: CommonStyle.Value = CommonStyle.default)
+  object Panel {
+    type Props = Panel
 
     val component = ScalaComponent.builder[Props]("Panel")
       .renderPC((_, p, c) =>
@@ -59,16 +65,21 @@ object Bootstrap {
           <.div(bss.panelBody, c)
         )
       ).build
+  }
 
-    def apply(props: Props, children: VdomNode*) = component(props)(children: _*)
-    def apply() = component
+  // header and footer are functions, so that they can get access to the the hide() function for their buttons
+  final case class Modal(
+    header: Callback => VdomNode,
+    footer: Callback => VdomNode,
+    closed: Callback,
+    backdrop: Boolean = true,
+    keyboard: Boolean = true
+  ) extends ReactPropsWithChildren {
+    @inline def render: Seq[CtorType.ChildArg] => VdomElement = Modal.component(this)
   }
 
   object Modal {
-
-    // header and footer are functions, so that they can get access to the the hide() function for their buttons
-    case class Props(header: Callback => VdomNode, footer: Callback => VdomNode, closed: Callback, backdrop: Boolean = true,
-                     keyboard: Boolean = true)
+    type Props = Modal
 
     class Backend(t: BackendScope[Props, Unit]) {
       def hide =
@@ -105,9 +116,6 @@ object Bootstrap {
         scope.getDOMNode.toElement.foreach(x => jQuery(x).on("hidden.bs.modal", null, null, scope.backend.hidden _))
       })
       .build
-
-    def apply(props: Props, children: VdomElement*) = component(props)(children: _*)
-    def apply() = component
   }
 
 }

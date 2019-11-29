@@ -56,7 +56,7 @@ object Todo {
     }
 
     def render(p: Props, s: State) =
-      Panel(Panel.Props("What needs to be done"),
+      Panel("What needs to be done")(
         p.view.flow { todosOpt =>
           val todos = Pot.fromOption(todosOpt).flatten
           <.div(
@@ -86,9 +86,9 @@ object Todo {
 }
 
 final case class TodoForm(
-  item: Option[TodoItem],
-  submitHandler: (TodoItem, Boolean) => IO[Unit]
-) extends ReactProps {
+                           item: Option[TodoItem],
+                           submitHandler: (TodoItem, Boolean) => IO[Unit]
+                         ) extends ReactProps {
   @inline def render: VdomElement = TodoForm.component(this)
 }
 
@@ -129,13 +129,14 @@ object TodoForm {
     def render(p: Props, s: State) = {
       log.debug(s"User is ${if (s.item.id == "") "adding" else "editing"} a todo or two")
       val headerText = if (s.item.id == "") "Add new todo" else "Edit todo"
-      Modal(Modal.Props(
+      Modal(
         // header contains a cancel button (X)
         header = hide => <.span(<.button(^.tpe := "button", bss.close, ^.onClick --> hide, Icon.close), <.h4(headerText)),
         // footer has the OK button that submits the form before hiding it
         footer = hide => <.span(Button(submitForm() >> hide)("OK")),
         // this is called after the modal has been hidden (animation is completed)
-        closed = formClosed(s, p)),
+        closed = formClosed(s, p)
+      )(
         <.div(bss.formGroup,
           <.label(^.`for` := "description", "Description"),
           <.input.text(bss.formControl, ^.id := "description", ^.value := s.item.content,

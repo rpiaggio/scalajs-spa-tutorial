@@ -31,8 +31,8 @@ object SPAMain {
 //    val todoWrapper = SPACircuit.connect(_.todos)
     // wrap/connect components to the circuit
     (staticRoute(root, DashboardLoc) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy)))
-      | staticRoute("#motd2", MotdLoc) ~> render(Motd(AppState.motdView))
-      | staticRoute("#todo2", TodoLoc) ~> render(Todo(AppState.todosView))
+      | staticRoute("#motd", MotdLoc) ~> render(Motd(AppState.motdView))
+      | staticRoute("#todo", TodoLoc) ~> render(Todo(AppState.todosView))
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
   }.renderWith(layout)
 

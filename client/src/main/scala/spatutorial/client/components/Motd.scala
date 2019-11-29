@@ -16,7 +16,7 @@ object Motd {
   val Motd = ScalaComponent.builder[View[IO, Pot[String]]]("Motd")
     .render_P { p =>
 
-      Panel(Panel.Props("Message of the day"),
+      Panel("Message of the day")(
         p.flow { motdOpt =>
           val motd = Pot.fromOption(motdOpt).flatten
           <.div(
