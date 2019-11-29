@@ -10,7 +10,7 @@ class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initi
   extends SignallingLens[F, A] {
   private val ref = SignallingRef.in[SyncIO, F, A](initialValue).unsafeRunSync()
 
-  val flow = Flow.flow(ref.discrete)
+  lazy val flow = Flow.flow(ref.discrete)
 
   // TODO Flow with pipe. But it can't be a def. We should use the same flow always in the same view.
   // Should it be a parameter of the View? A method .viewWithPipe that creates another flow?
