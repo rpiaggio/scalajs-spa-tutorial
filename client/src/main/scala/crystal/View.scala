@@ -26,7 +26,7 @@ class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initi
 
   def algebra[H[_[_]]](implicit algebra: H[F]): H[F] = algebra
 
-  // Is this really useful? Most of the times we need an immediate View, not one within an effect.
+  // Is this really useful? Most of the times we need an immediate View, not one within a (non-sync) effect.
   def zoom[B](otherLens: Lens[A, B]): F[View[F, B]] = {
     val newLens = fixedLens compose otherLens
     for {
@@ -34,6 +34,11 @@ class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initi
     } yield {
       new View(fixedLens compose otherLens, a)
     }
+  }
+
+  def zoom[B](otherLens: Lens[A, B], withInitialValue: B): View[F, B] = {
+    val newLens = fixedLens compose otherLens
+    new View(fixedLens compose otherLens, withInitialValue)
   }
 }
 
