@@ -95,12 +95,14 @@ object Chart {
     )
     .componentDidMount(scope => Callback {
       // access context of the canvas
-      val ctx = scope.getDOMNode.asInstanceOf[HTMLCanvasElement].getContext("2d")
-      // create the actual chart using the 3rd party component
-      scope.props.style match {
-        case LineChart => new JSChart(ctx, ChartConfiguration("line", scope.props.data))
-        case BarChart => new JSChart(ctx, ChartConfiguration("bar", scope.props.data))
-        case _ => throw new IllegalArgumentException
+      scope.getDOMNode.toElement.foreach{ element =>
+        val ctx = element.asInstanceOf[HTMLCanvasElement].getContext("2d")
+        // create the actual chart using the 3rd party component
+        scope.props.style match {
+          case LineChart => new JSChart(ctx, ChartConfiguration("line", scope.props.data))
+          case BarChart => new JSChart(ctx, ChartConfiguration("bar", scope.props.data))
+          case _ => throw new IllegalArgumentException
+        }
       }
     }).build
 

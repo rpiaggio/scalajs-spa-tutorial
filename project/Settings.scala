@@ -14,7 +14,7 @@ object Settings {
   val name = "scalajs-spa"
 
   /** The version of your application */
-  val version = "1.1.5"
+  val version = "1.2.0"
 
   /** Options for the scala compiler */
   val scalacOptions = Seq(
@@ -28,7 +28,7 @@ object Settings {
   object versions {
 //    val scala = "2.11.11"
     val scala = "2.12.10"
-    val scalaDom = "0.9.3"
+    val scalaDom = "0.9.7"
     val scalajsReact = "1.4.2"
     val scalaCSS = "0.5.3"
     val scalajsReactCommon = "0.3.2"
@@ -42,7 +42,7 @@ object Settings {
     val react = "16.7.0"
     val jQuery = "1.11.1"
     val bootstrap = "3.3.6"
-    val chartjs = "2.1.3"
+    val chartjs = "2.9.3"
 
     val cats = "2.0.0"
     val fs2 = "2.0.0"

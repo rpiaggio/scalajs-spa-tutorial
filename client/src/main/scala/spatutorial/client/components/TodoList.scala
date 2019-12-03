@@ -6,7 +6,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scalacss.ScalaCssReact._
 import spatutorial.client.components.Bootstrap.{Button, CommonStyle}
 import spatutorial.shared._
-import crystal._
+import crystal.implicits._
 import react.common.ReactProps
 
 final case class TodoList(
@@ -24,7 +24,7 @@ object TodoList {
   // shorthand for styles
   @inline private def bss = GlobalStyles.bootstrapStyles
 
-  val component = ScalaComponent.builder[Props]("TodoList2")
+  val component = ScalaComponent.builder[Props]("TodoList")
     .render_P(p => {
       val style = bss.listGroup
       def renderItem(item: TodoItem) = {

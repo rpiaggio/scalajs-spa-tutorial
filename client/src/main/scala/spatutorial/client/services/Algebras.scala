@@ -46,14 +46,14 @@ object Algebras {
 
   implicit object MotdAlgebraIO extends MotdAlgebraInterpreter[IO](AppState.motdView)
 
-  trait TodoAlgebra[F[_]] {
+  trait TodosAlgebra[F[_]] {
     def refreshTodos(): F[Unit]
     def updateAllTodos(todos: Seq[TodoItem]): F[Unit]
     def updateTodo(item: TodoItem): F[Unit]
     def deleteTodo(item: TodoItem): F[Unit]
   }
 
-  class TodoAlgebraInterpreter[F[_] : Effect](lens: SignallingLens[F, Pot[Todos]]) extends TodoAlgebra[F] {
+  class TodosAlgebraInterpreter[F[_] : Effect](lens: SignallingLens[F, Pot[Todos]]) extends TodosAlgebra[F] {
     implicit private val ec: ExecutionContext = global
 
     protected object Ajax {
@@ -110,5 +110,5 @@ object Algebras {
       } yield ()
   }
 
-  implicit object TodoAlgebraIO extends TodoAlgebraInterpreter[IO](AppState.todosView)
+  implicit object TodosAlgebraIO$ extends TodosAlgebraInterpreter[IO](AppState.todosView)
 }

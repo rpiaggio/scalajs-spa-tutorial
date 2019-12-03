@@ -46,8 +46,8 @@ object SPAMain {
           <.div(^.className := "navbar-header", <.span(^.className := "navbar-brand", "SPA Tutorial")),
           <.div(^.className := "collapse navbar-collapse",
             // connect menu to model, because it needs to update when the number of open todos changes
+            MainMenu(c, r.page, AppState.todosView)
 //            todoCountWrapper(proxy => MainMenu(c, r.page, proxy))
-            "COUNT WRAPPER"
           )
         )
       ),

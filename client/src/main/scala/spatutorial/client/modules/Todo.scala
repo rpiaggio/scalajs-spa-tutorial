@@ -11,9 +11,10 @@ import spatutorial.client.logger._
 import spatutorial.client.services._
 import spatutorial.shared._
 import crystal._
+import crystal.implicits._
 import react.common.ReactProps
 import scalacss.ScalaCssReact._
-import spatutorial.client.services.Algebras.{LogAlgebra, TodoAlgebra}
+import spatutorial.client.services.Algebras.{LogAlgebra, TodosAlgebra}
 
 final case class Todo(view: View[IO, Pot[Todos]]) extends ReactProps {
   @inline def render: VdomElement = Todo.component(this)
@@ -29,7 +30,7 @@ object Todo {
     // dispatch a message to refresh the todos, which will cause TodoStore to fetch todos from the server
       props.view.get.flatMap { todosPot =>
         if (todosPot.isEmpty)
-          props.view.algebra[TodoAlgebra].refreshTodos()
+          props.view.algebra[TodosAlgebra].refreshTodos()
         else
           IO.unit
       }
@@ -48,7 +49,7 @@ object Todo {
         for {
           p <- $.propsIO
           _ <- p.view.algebra[LogAlgebra].log(s"Todo edited: $item")
-          _ <- p.view.algebra[TodoAlgebra].updateTodo(item)
+          _ <- p.view.algebra[TodosAlgebra].updateTodo(item)
         } yield ()
       }
       // hide the edit dialog, chain IOs
@@ -63,9 +64,9 @@ object Todo {
             todos.renderFailed(ex => "Error loading"),
             todos.renderPending(_ > 500, _ => "Loading..."),
             todos.render(todos => TodoList(todos.items,
-              item => p.view.algebra[TodoAlgebra].updateTodo(item),
+              item => p.view.algebra[TodosAlgebra].updateTodo(item),
               item => editTodo(Some(item)),
-              item => p.view.algebra[TodoAlgebra].deleteTodo(item))),
+              item => p.view.algebra[TodosAlgebra].deleteTodo(item))),
             Button(editTodo(None))(Icon.plusSquare, " New")
           )
         },
