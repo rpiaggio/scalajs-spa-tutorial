@@ -10,7 +10,11 @@ import scala.language.higherKinds
 class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initialValue: A) extends SignallingLens[F, A] {
   private val ref = SignallingRef.in[SyncIO, F, A](initialValue).unsafeRunSync()
 
-  lazy val flow = Flow.flow(ref.discrete)
+  private val stream = ref.discrete
+
+  lazy val flow = Flow.flow(stream)
+
+  lazy val flowWithZoom = ??? // Provide the value and a zoom function, now that we have the value....?
 
   // TODO Flow with pipe. But it can't be a def. We should use the same flow always in the same view.
   // Should it be a parameter of the View? A method .viewWithPipe that creates another flow?
