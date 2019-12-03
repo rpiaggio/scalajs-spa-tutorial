@@ -22,8 +22,6 @@ final case class Dashboard(
 object Dashboard {
   type Props = Dashboard
 
-//  case class State(motdWrapper: ReactConnectProxy[Pot[String]])
-
   // create dummy data for the chart
   val cp = Chart.ChartProps(
     "Test chart",
@@ -36,17 +34,11 @@ object Dashboard {
 
   // create the React component for Dashboard
   private val component = ScalaComponent.builder[Props]("Dashboard")
-    // create and store the connect proxy in state for later use
-//    .initialStateFromProps(props => State(props.proxy.connect(m => m)))
     .renderPS { (_, props, state) =>
       <.div(
         // header, MessageOfTheDay and chart components
         <.h2("Dashboard"),
-
         Motd(props.view),
-
-//        state.motdWrapper(Motd(_)),
-
         Chart(cp),
         // create a link to the To Do view
         <.div(props.router.link(TodoLoc)("Check your todos!"))

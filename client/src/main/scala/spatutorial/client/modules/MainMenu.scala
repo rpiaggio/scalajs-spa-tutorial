@@ -1,7 +1,8 @@
 package spatutorial.client.modules
 
 import cats.effect.IO
-import crystal.View
+import crystal._
+import crystal.implicits._
 import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
@@ -14,7 +15,6 @@ import spatutorial.client.components._
 import spatutorial.client.services._
 import scalacss.ScalaCssReact._
 import spatutorial.client.services.Algebras.TodosAlgebra
-import crystal.implicits._
 
 case class MainMenu(
                      router: RouterCtl[Loc],
@@ -50,12 +50,8 @@ object MainMenu {
   protected class Backend($: BackendScope[Props, Unit]) {
     def mounted(props: Props) =
     // dispatch a message to refresh the todos
-    props.view.get.flatMap { todosPot =>
-      if(todosPot.isEmpty)
-        props.view.algebra[TodosAlgebra].refreshTodos()
-      else
-        IO.unit
-    }
+      props.view.algebra[TodosAlgebra].refreshTodos()
+        .when(props.view.get.map(_.isEmpty))
 
     def render(props: Props) = {
       <.ul(bss.navbar)(

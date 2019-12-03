@@ -27,13 +27,9 @@ object Todo {
 
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) =
-    // dispatch a message to refresh the todos, which will cause TodoStore to fetch todos from the server
-      props.view.get.flatMap { todosPot =>
-        if (todosPot.isEmpty)
-          props.view.algebra[TodosAlgebra].refreshTodos()
-        else
-          IO.unit
-      }
+      // dispatch a message to refresh the todos, which will cause TodoStore to fetch todos from the server
+      props.view.algebra[TodosAlgebra].refreshTodos()
+          .when(props.view.get.map(_.isEmpty))
 
     def editTodo(item: Option[TodoItem]) =
     // activate the edit dialog

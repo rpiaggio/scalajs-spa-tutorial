@@ -38,12 +38,8 @@ object Motd {
     }
     .componentDidMount(scope =>
       //       update only if Motd is empty
-      scope.props.get.flatMap { motdPot =>
-        if(motdPot.isEmpty)
-          scope.props.algebra[MotdAlgebra].updateMotd
-        else
-          IO.unit
-      }
+      scope.props.algebra[MotdAlgebra].updateMotd()
+        .when(scope.props.get.map(_.isEmpty))
     )
     .build
 

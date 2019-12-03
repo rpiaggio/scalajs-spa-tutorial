@@ -23,7 +23,7 @@ object Algebras {
   }
 
   trait MotdAlgebra[F[_]] {
-    def updateMotd: F[Unit]
+    def updateMotd(): F[Unit]
   }
 
   class MotdAlgebraInterpreter[F[_] : Effect](lens: SignallingLens[F, Pot[String]]) extends MotdAlgebra[F] {

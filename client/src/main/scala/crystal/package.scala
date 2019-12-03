@@ -1,3 +1,4 @@
+import cats.Monad
 import cats.effect.{IO, SyncIO}
 import japgolly.scalajs.react.component.Generic.MountedSimple
 import japgolly.scalajs.react.{Callback, CallbackTo, StateAccess}
@@ -82,4 +83,18 @@ package object crystal {
 
   }
 
+
+  import scala.language.higherKinds
+  import cats.implicits._
+
+  // I'm sure there a way to do this in cats already
+  implicit class UnitMonadOps[F[_]: Monad](f: F[Unit]) {
+    def when(cond: F[Boolean]): F[Unit] =
+      cond.flatMap { result =>
+        if(result)
+          f
+        else
+          Monad[F].unit
+      }
+  }
 }
