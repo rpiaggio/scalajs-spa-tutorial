@@ -3,11 +3,11 @@ package crystal
 import cats.effect.{ConcurrentEffect, SyncIO, Timer}
 import cats.implicits._
 import fs2.concurrent.SignallingRef
+import monocle.Lens
 
 import scala.language.higherKinds
 
-class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initialValue: A, updateModel: A => F[Unit])
-  extends SignallingLens[F, A] {
+class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initialValue: A) extends SignallingLens[F, A] {
   private val ref = SignallingRef.in[SyncIO, F, A](initialValue).unsafeRunSync()
 
   lazy val flow = Flow.flow(ref.discrete)
@@ -19,14 +19,22 @@ class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initi
   override def get: F[A] = fixedLens.get
 
   override def set(value: A): F[Unit] =
-    updateModel(value) *> ref.set(value)
+    fixedLens.set(value) *> ref.set(value)
 
   override def modify(f: A => A): F[Unit] =
     get.flatMap(a => set(f(a)))
 
   def algebra[H[_[_]]](implicit algebra: H[F]): H[F] = algebra
 
-//  def zoom[B](otherLens: Lens[A, B]): View[F, B] = {
-//    new View(fixedLens compose otherLens, (lens).get(initialModel), a => modelRef.update(lens.set(a)))
-//  }
+  // Is this really useful? Most of the times we need an immediate View, not one within an effect.
+  def zoom[B](otherLens: Lens[A, B]): F[View[F, B]] = {
+    val newLens = fixedLens compose otherLens
+    for {
+      a <- newLens.get
+    } yield {
+      new View(fixedLens compose otherLens, a)
+    }
+  }
 }
+
+

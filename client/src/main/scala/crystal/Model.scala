@@ -19,6 +19,6 @@ case class Model[F[_] : ConcurrentEffect : Timer, M](initialModel: M) {
   //   In that case, we have to make sure the sync one is convertible to the general one.
   def view[A](lens: Lens[M, A]): View[F, A] = {
     val fixedLens = FixedLens.fromLensAndModelRef(lens, modelRef)
-    new View(fixedLens, lens.get(initialModel), a => modelRef.update(lens.set(a)))
+    new View(fixedLens, lens.get(initialModel))
   }
 }

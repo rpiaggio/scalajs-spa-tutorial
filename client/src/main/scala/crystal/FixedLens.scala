@@ -7,7 +7,7 @@ import monocle.Lens
 
 import scala.language.higherKinds
 
-// Hides the model type M.
+// Hides the model type M. Otherwise, we have to declare it in every View.
 trait FixedLens[F[_], A] {
   def get: F[A]
   def set(a: A): F[Unit]
