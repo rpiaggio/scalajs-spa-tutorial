@@ -35,14 +35,14 @@ object Settings {
     val log4js = "1.4.10"
     val autowire = "0.2.6"
     val booPickle = "1.3.1"
-    val diode = "1.1.5"
+    val diodeData = "1.1.5"
     val diodeReact = "1.1.5.142"
     val uTest = "0.4.7"
 
     val react = "16.7.0"
     val jQuery = "1.11.1"
     val bootstrap = "3.3.6"
-    val chartjs = "2.9.3"
+    val chartjs = "2.8.0"
 
     val cats = "2.0.0"
     val fs2 = "2.0.0"
@@ -76,7 +76,7 @@ object Settings {
     "com.github.japgolly.scalajs-react" %%% "extra" % versions.scalajsReact,
     "com.github.japgolly.scalacss" %%% "ext-react" % versions.scalaCSS,
     "io.github.cquiroz.react" %%% "common" % versions.scalajsReactCommon,
-    "io.suzaku" %%% "diode" % versions.diode,
+    "io.suzaku" %%% "diode-data" % versions.diodeData,
     "io.suzaku" %%% "diode-react" % versions.diodeReact,
     "org.scala-js" %%% "scalajs-dom" % versions.scalaDom,
     "org.typelevel" %%% "cats-core" % versions.cats,
@@ -94,7 +94,7 @@ object Settings {
     "org.webjars.npm" % "react-dom" % versions.react / "umd/react-dom.development.js" minified "umd/react-dom.production.min.js" dependsOn "umd/react.development.js" commonJSName "ReactDOM",
     "org.webjars" % "jquery" % versions.jQuery / "jquery.js" minified "jquery.min.js",
     "org.webjars" % "bootstrap" % versions.bootstrap / "bootstrap.js" minified "bootstrap.min.js" dependsOn "jquery.js",
-    "org.webjars" % "chartjs" % versions.chartjs / "Chart.js" minified "Chart.min.js",
+    "org.webjars.npm" % "github-com-chartjs-Chart-js" % versions.chartjs / "Chart.js" minified "Chart.min.js",
     "org.webjars" % "log4javascript" % versions.log4js / "js/log4javascript_uncompressed.js" minified "js/log4javascript.js"
   ))
 }
