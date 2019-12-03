@@ -7,10 +7,13 @@ import monocle.Lens
 
 import scala.language.higherKinds
 
+// Hides the model type M.
 trait FixedLens[F[_], A] {
   def get: F[A]
   def set(a: A): F[Unit]
   def modify(f: A => A): F[Unit]
+
+  def compose[B](otherLens: Lens[A, B]): FixedLens[F, B]
 }
 
 object FixedLens {
@@ -18,5 +21,8 @@ object FixedLens {
     override def get: F[A] = modelRef.get.map(model => lens.get(model))
     override def set(a: A): F[Unit] = modelRef.update(model => lens.set(a)(model))
     override def modify(f: A => A): F[Unit] = modelRef.update(model => lens.modify(f)(model))
+
+    def compose[B](otherLens: Lens[A, B]): FixedLens[F, B] =
+      fromLensAndModelRef(lens composeLens otherLens, modelRef)
   }
 }

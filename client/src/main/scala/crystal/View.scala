@@ -25,4 +25,8 @@ class View[F[_] : ConcurrentEffect : Timer, A](fixedLens: FixedLens[F, A], initi
     get.flatMap(a => set(f(a)))
 
   def algebra[H[_[_]]](implicit algebra: H[F]): H[F] = algebra
+
+//  def zoom[B](otherLens: Lens[A, B]): View[F, B] = {
+//    new View(fixedLens compose otherLens, (lens).get(initialModel), a => modelRef.update(lens.set(a)))
+//  }
 }
