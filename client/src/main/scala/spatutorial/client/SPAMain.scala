@@ -6,7 +6,7 @@ import org.scalajs.dom
 import spatutorial.client.components.{GlobalStyles, Motd}
 import spatutorial.client.logger._
 import spatutorial.client.modules._
-import spatutorial.client.services.{AppState, SPACircuit}
+import spatutorial.client.services.AppState
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import CssSettings._
@@ -28,9 +28,8 @@ object SPAMain {
   val routerConfig = RouterConfigDsl[Loc].buildConfig { dsl =>
     import dsl._
 
-//    val todoWrapper = SPACircuit.connect(_.todos)
     // wrap/connect components to the circuit
-    (staticRoute(root, DashboardLoc) ~> renderR(ctl => SPACircuit.wrap(_.motd)(proxy => Dashboard(ctl, proxy)))
+    (staticRoute(root, DashboardLoc) ~> renderR(ctl => Dashboard(ctl, AppState.motdView))
       | staticRoute("#motd", MotdLoc) ~> render(Motd(AppState.motdView))
       | staticRoute("#todo", TodoLoc) ~> render(Todo(AppState.todosView))
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
