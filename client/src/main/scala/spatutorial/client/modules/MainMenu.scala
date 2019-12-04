@@ -7,7 +7,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
 import react.common.ReactProps
-import spatutorial.client.SPAMain.{DashboardLoc, Loc, TodoLoc}
+import spatutorial.client.SPAMain.{DashboardLoc, Loc, ProgressLoc, TodoLoc}
 import spatutorial.client.components.Bootstrap.CommonStyle
 import spatutorial.client.components.Icon._
 import spatutorial.client.components._
@@ -42,7 +42,8 @@ object MainMenu {
 
   private val menuItems = Seq(
     MenuItem(1, _ => "Dashboard", Icon.dashboard, DashboardLoc),
-    MenuItem(2, buildTodoMenu, Icon.check, TodoLoc)
+    MenuItem(2, buildTodoMenu, Icon.check, TodoLoc),
+    MenuItem(3, _ => "Progress", Icon.clockO, ProgressLoc)
   )
 
   protected class Backend($: BackendScope[Props, Unit]) {

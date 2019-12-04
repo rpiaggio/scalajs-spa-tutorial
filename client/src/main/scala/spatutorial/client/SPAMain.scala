@@ -1,22 +1,28 @@
 package spatutorial.client
 
+import fs2._
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom
-import spatutorial.client.components.{GlobalStyles, Motd}
+import spatutorial.client.components.{GlobalStyles, Motd, Progress}
 import spatutorial.client.logger._
 import spatutorial.client.modules._
 import spatutorial.client.services.AppState
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import CssSettings._
-import cats.effect.IO
+import cats.effect.{IO, Timer}
 import crystal.ViewRO
 import scalacss.ScalaCssReact._
 import spatutorial.client.services.AppState.RootModel
 
+import scala.concurrent.ExecutionContext.global
+import scala.concurrent.duration._
+import scala.language.postfixOps
+
 @JSExportTopLevel("SPAMain")
 object SPAMain {
+  implicit private val timerIO: Timer[IO] = cats.effect.IO.timer(global)
 
   // Define the locations (pages) used in this application
   sealed trait Loc
@@ -27,6 +33,11 @@ object SPAMain {
 
   case object TodoLoc extends Loc
 
+  case object ProgressLoc extends Loc
+
+  val MaxProgress = 1000
+  def progressFlow: Stream[IO, Int] = Stream.range(0, MaxProgress + 1).covary[IO].metered(50 milliseconds)
+
   // configure the router
   val routerConfig = RouterConfigDsl[Loc].buildConfig { dsl =>
     import dsl._
@@ -35,6 +46,7 @@ object SPAMain {
     (staticRoute(root, DashboardLoc) ~> renderR(ctl => Dashboard(ctl, AppState.motdFocusView))
       | staticRoute("#motd", MotdLoc) ~> render(Motd(AppState.motdFocusView))
       | staticRoute("#todo", TodoLoc) ~> render(Todo(AppState.todosView))
+      | staticRoute("#progress", ProgressLoc) ~> render(Progress(MaxProgress, progressFlow))
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
   }.renderWith(layout)
 

@@ -16,8 +16,8 @@ case class Model[F[_] : ConcurrentEffect : Timer, M](initialModel: M) {
     val fixedLens = FixedLens.fromLensAndModelRef(lens, modelRef)
     // Do we have to split the stream here or pass the same one? Topic?
     // Also: do we have to watch out for resource leaks?
-    // We should drop duplicates.
+    // We should drop duplicates by Eq?
     // Or use reusability here?
-    new View(fixedLens, stream.map(lens.get))
+    new View(fixedLens, stream.map(lens.get).filterWithPrevious(_ != _))
   }
 }

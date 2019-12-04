@@ -17,7 +17,7 @@ sealed class ViewRO[F[_] : ConcurrentEffect, A](val get: F[A], val stream: Strea
 
   // map takes any function. We lose access to the model and cannot write to it anymore. Hence ViewRO.
   def map[B](f: A => B): ViewRO[F, B] = {
-    new ViewRO(get.map(f), stream.map(f))
+    new ViewRO(get.map(f), stream.map(f).filterWithPrevious(_ != _))
   }
 }
 
@@ -36,7 +36,7 @@ class View[F[_] : ConcurrentEffect, A](fixedLens: FixedLens[F, A], stream: Strea
 
   // zoom takes a lens, we can continue writing to the model.
   def zoom[B](otherLens: Lens[A, B]): View[F, B] = {
-    new View(fixedLens compose otherLens, stream.map(otherLens.get))
+    new View(fixedLens compose otherLens, stream.map(otherLens.get).filterWithPrevious(_ != _))
   }
 }
 
