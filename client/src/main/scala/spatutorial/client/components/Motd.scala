@@ -16,7 +16,6 @@ import diode.react.ReactPot._
 object Motd {
   val Motd = ScalaComponent.builder[View[IO, Pot[String]]]("Motd")
     .render_P { p =>
-
       Panel("Message of the day")(
         p.flow { motdOpt =>
           val motd = Pot.fromOption(motdOpt).flatten
@@ -28,7 +27,7 @@ object Motd {
         },
 
         Button(
-          p.algebra[MotdAlgebra].updateMotd,
+          p.algebra[MotdAlgebra].updateMotd(),
           CommonStyle.danger)(Icon.refresh, " Update"),
 
         Button(

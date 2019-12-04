@@ -90,11 +90,6 @@ package object crystal {
   // I'm sure there a way to do this in cats already
   implicit class UnitMonadOps[F[_]: Monad](f: F[Unit]) {
     def when(cond: F[Boolean]): F[Unit] =
-      cond.flatMap { result =>
-        if(result)
-          f
-        else
-          Monad[F].unit
-      }
+      cond.flatMap(f.whenA)
   }
 }

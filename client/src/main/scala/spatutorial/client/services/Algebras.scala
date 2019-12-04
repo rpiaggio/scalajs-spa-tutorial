@@ -14,7 +14,7 @@ import scala.language.higherKinds
 import scala.util.{Failure, Success}
 
 object Algebras {
-  private def asyncCall[F[_] : Async, A](invocation: Future[A])(implicit ec: ExecutionContext): F[A] =
+  private def asyncCall[F[_] : Async, A](invocation: => Future[A])(implicit ec: ExecutionContext): F[A] =
     Async[F].async { cb =>
       invocation.onComplete {
         case Success(value) => cb(Right(value))
@@ -40,7 +40,7 @@ object Algebras {
     protected def queryMotd: F[String] =
       asyncCall(AjaxClient[Api].welcomeMsg("User X").call())
 
-    def updateMotd: F[Unit] =
+    def updateMotd(): F[Unit] =
       for {
         motd <- queryMotd
         _ <- lens.set(Ready(motd))
