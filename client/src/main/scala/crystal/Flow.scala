@@ -14,6 +14,8 @@ object Flow {
 
   type State[A] = Option[A] // Use Pot or something else that can hold errors
 
+  // We should let pass Reusability[A] somewhere (or provide it in a View).
+
   def flow[F[_] : ConcurrentEffect, A](stream: fs2.Stream[F, A], key: js.UndefOr[js.Any] = js.undefined): ReactFlowComponent[A] = {
 
     class Backend($: BackendScope[ReactFlowProps[A], State[A]]) {
