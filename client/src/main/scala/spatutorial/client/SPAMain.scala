@@ -32,8 +32,8 @@ object SPAMain {
     import dsl._
 
     // wrap/connect components to the circuit
-    (staticRoute(root, DashboardLoc) ~> renderR(ctl => Dashboard(ctl, AppState.motdView))
-      | staticRoute("#motd", MotdLoc) ~> render(Motd(AppState.motdView))
+    (staticRoute(root, DashboardLoc) ~> renderR(ctl => Dashboard(ctl, AppState.motdFocusView))
+      | staticRoute("#motd", MotdLoc) ~> render(Motd(AppState.motdFocusView))
       | staticRoute("#todo", TodoLoc) ~> render(Todo(AppState.todosView))
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
   }.renderWith(layout)

@@ -9,22 +9,25 @@ import crystal._
 import crystal.implicits._
 import spatutorial.client.services.Algebras._
 import diode.react.ReactPot._
+import spatutorial.client.services.AppState.MotdFocus
 
 /**
  * This is a simple component demonstrating how to display async data coming from the server
  */
 object Motd {
-  val Motd = ScalaComponent.builder[View[IO, Pot[String]]]("Motd")
+  val component = ScalaComponent.builder[View[IO, MotdFocus]]("Motd")
     .render_P { p =>
       Panel("Message of the day")(
-        p.flow { motdOpt =>
-          val motd = Pot.fromOption(motdOpt).flatten
+        p.flow { motdFocusOpt =>
+          val motd = Pot.fromOption(motdFocusOpt).map(_.motd).flatten
           <.div(
             motd.renderPending(_ > 500, _ => <.p("Loading...")),
             motd.renderFailed(ex => <.p("Failed to load")),
             motd.render(m => <.p(m))
           )
         },
+
+        MotdWhen(p.zoom(MotdFocus.motdInstant)),
 
         Button(
           p.algebra[MotdAlgebra].updateMotd(),
@@ -38,9 +41,9 @@ object Motd {
     .componentDidMount(scope =>
       //       update only if Motd is empty
       scope.props.algebra[MotdAlgebra].updateMotd()
-        .when(scope.props.get.map(_.isEmpty))
+        .when(scope.props.get.map(_.motd.isEmpty))
     )
     .build
 
-  def apply(props: View[IO, Pot[String]]) = Motd(props)
+  def apply(props: View[IO, MotdFocus]) = component(props)
 }

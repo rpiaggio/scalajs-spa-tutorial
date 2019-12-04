@@ -15,6 +15,7 @@ sealed class ViewRO[F[_] : ConcurrentEffect, A](val get: F[A], stream: Stream[F,
   // Useful for getting an algebra already in F[_].
   def algebra[H[_[_]]](implicit algebra: H[F]): H[F] = algebra
 
+  // map takes any function. We lose access to the model and cannot write to it anymore. Hence ViewRO.
   def map[B](f: A => B): ViewRO[F, B] = {
     new ViewRO(get.map(f), stream.map(f))
   }
@@ -33,9 +34,10 @@ class View[F[_] : ConcurrentEffect, A](fixedLens: FixedLens[F, A], stream: Strea
   override def modify(f: A => A): F[Unit] =
     fixedLens.modify(f)
 
-  override protected[crystal] def compose[B](otherLens: Lens[A, B]): FixedLens[F, B] =
+  /*override protected[crystal]*/ def compose[B](otherLens: Lens[A, B]): FixedLens[F, B] =
     throw new Exception("Views cannot be composed with other lenses. Try .zoom or .map instead.")
 
+  // zoom takes a lens, we can continue writing to the model.
   def zoom[B](otherLens: Lens[A, B]): View[F, B] = {
     new View(fixedLens compose otherLens, stream.map(otherLens.get))
   }

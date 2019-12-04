@@ -3,7 +3,7 @@ package crystal
 import cats.Functor
 import cats.effect.concurrent.Ref
 import cats.implicits._
-import monocle.Lens
+import monocle._
 
 import scala.language.higherKinds
 
@@ -13,7 +13,7 @@ trait FixedLens[F[_], A] {
   def set(a: A): F[Unit]
   def modify(f: A => A): F[Unit]
 
-  protected[crystal] def compose[B](otherLens: Lens[A, B]): FixedLens[F, B]
+  /*protected[crystal]*/ def compose[B](otherLens: Lens[A, B]): FixedLens[F, B]
 }
 
 object FixedLens {
@@ -22,7 +22,7 @@ object FixedLens {
     override def set(a: A): F[Unit] = modelRef.update(model => lens.set(a)(model))
     override def modify(f: A => A): F[Unit] = modelRef.update(model => lens.modify(f)(model))
 
-    override protected[crystal] def compose[B](otherLens: Lens[A, B]): FixedLens[F, B] =
+    /*override protected[crystal]*/ def compose[B](otherLens: Lens[A, B]): FixedLens[F, B] =
       fromLensAndModelRef(lens composeLens otherLens, modelRef)
   }
 }

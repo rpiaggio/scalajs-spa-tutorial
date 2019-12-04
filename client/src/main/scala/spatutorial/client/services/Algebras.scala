@@ -1,11 +1,14 @@
 package spatutorial.client.services
 
+import java.time.Instant
+
 import cats.effect.{Async, Effect, IO}
 import cats.implicits._
 import crystal._
 import autowire._
 import boopickle.Default._
 import diode.data._
+import spatutorial.client.services.AppState.MotdFocus
 import spatutorial.shared.{Api, TodoItem}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -34,7 +37,7 @@ object Algebras {
     def updateMotd(): F[Unit]
   }
 
-  class MotdAlgebraInterpreter[F[_] : Effect](lens: FixedLens[F, Pot[String]]) extends MotdAlgebra[F] {
+  class MotdAlgebraInterpreter[F[_] : Effect](lens: FixedLens[F, MotdFocus]) extends MotdAlgebra[F] {
     implicit protected val ec: ExecutionContext = global
 
     protected def queryMotd: F[String] =
@@ -43,11 +46,11 @@ object Algebras {
     def updateMotd(): F[Unit] =
       for {
         motd <- queryMotd
-        _ <- lens.set(Ready(motd))
+        _ <- lens.set(MotdFocus(Ready(motd), Instant.now.some))
       } yield ()
   }
 
-  implicit object MotdAlgebraIO extends MotdAlgebraInterpreter[IO](AppState.motdView)
+  implicit object MotdAlgebraIO extends MotdAlgebraInterpreter[IO](AppState.motdFocusView)
 
   trait TodosAlgebra[F[_]] {
     def refreshTodos(): F[Unit]

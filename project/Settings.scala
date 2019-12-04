@@ -82,9 +82,10 @@ object Settings {
     "org.typelevel" %%% "cats-core" % versions.cats,
     "org.typelevel" %%% "cats-effect" % versions.cats,
     "co.fs2" %%% "fs2-core" % versions.fs2,
+    "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC2",
     // "com.rpiaggio" %%% "crystal" % versions.crystal, // For the moment crystal is being developed here.
-    "com.github.julien-truffaut" %%  "monocle-core"  % versions.monocle,
-    "com.github.julien-truffaut" %%  "monocle-macro"  % versions.monocle,
+    "com.github.julien-truffaut" %%%  "monocle-core"  % versions.monocle,
+    "com.github.julien-truffaut" %%%  "monocle-macro"  % versions.monocle,
     "com.lihaoyi" %%% "utest" % versions.uTest % Test
   ))
 
