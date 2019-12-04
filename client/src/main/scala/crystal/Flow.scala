@@ -14,7 +14,7 @@ object Flow {
 
   type State[A] = Option[A] // Use Pot or something else that can hold errors
 
-  def flow[F[_] : ConcurrentEffect : Timer, A](stream: fs2.Stream[F, A], key: js.UndefOr[js.Any] = js.undefined): ReactFlowComponent[A] = {
+  def flow[F[_] : ConcurrentEffect, A](stream: fs2.Stream[F, A], key: js.UndefOr[js.Any] = js.undefined): ReactFlowComponent[A] = {
 
     class Backend($: BackendScope[ReactFlowProps[A], State[A]]) {
 

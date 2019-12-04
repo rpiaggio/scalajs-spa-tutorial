@@ -17,7 +17,7 @@ object AppState {
 
   val rootModel = Model[IO, RootModel](RootModel(Empty, Empty))
 
-  val todosView = rootModel.view(RootModel.todos)
+  val todosView: View[IO, Pot[Todos]] = rootModel.view(RootModel.todos)
 
-  val motdView = rootModel.view(RootModel.motd)
+  val motdView: View[IO, Pot[String]] = rootModel.view(RootModel.motd)
 }

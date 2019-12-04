@@ -26,7 +26,7 @@ object Algebras {
     def updateMotd(): F[Unit]
   }
 
-  class MotdAlgebraInterpreter[F[_] : Effect](lens: SignallingLens[F, Pot[String]]) extends MotdAlgebra[F] {
+  class MotdAlgebraInterpreter[F[_] : Effect](lens: FixedLens[F, Pot[String]]) extends MotdAlgebra[F] {
     implicit private val ec: ExecutionContext = global
 
     protected def queryMotd: F[String] =
@@ -53,7 +53,7 @@ object Algebras {
     def deleteTodo(item: TodoItem): F[Unit]
   }
 
-  class TodosAlgebraInterpreter[F[_] : Effect](lens: SignallingLens[F, Pot[Todos]]) extends TodosAlgebra[F] {
+  class TodosAlgebraInterpreter[F[_] : Effect](lens: FixedLens[F, Pot[Todos]]) extends TodosAlgebra[F] {
     implicit private val ec: ExecutionContext = global
 
     protected object Ajax {

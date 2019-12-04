@@ -10,6 +10,8 @@ import spatutorial.client.services.AppState
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import CssSettings._
+import cats.effect.IO
+import crystal.ViewRO
 import scalacss.ScalaCssReact._
 import spatutorial.client.services.AppState.RootModel
 
@@ -36,10 +38,9 @@ object SPAMain {
       ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
   }.renderWith(layout)
 
-//  val todoCountWrapper = SPACircuit.connect(_.todos.map(_.items.count(!_.completed)).toOption)
-
-  // This uses another view over the same data. We could use AppState.todosView, but just for demo purposes we define another one.
-  val todoCountView = AppState.rootModel.view(RootModel.todos).map(_.map(_.items.count(!_.completed)).toOption)
+  // This uses another view over the same data as AppState.todosView, but just for demo purposes we define a new one.
+  val todoCountView: ViewRO[IO, Option[Int]] =
+    AppState.rootModel.view(RootModel.todos).map(_.map(_.items.count(!_.completed)).toOption)
 
   // base layout for all pages
   def layout(c: RouterCtl[Loc], r: Resolution[Loc]) = {
@@ -51,7 +52,6 @@ object SPAMain {
           <.div(^.className := "collapse navbar-collapse",
             // connect menu to model, because it needs to update when the number of open todos changes
             MainMenu(c, r.page, todoCountView)
-//            todoCountWrapper(proxy => MainMenu(c, r.page, proxy))
           )
         )
       ),
