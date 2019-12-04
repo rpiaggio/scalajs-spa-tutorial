@@ -14,6 +14,8 @@ case class Model[F[_] : ConcurrentEffect : Timer, M](initialModel: M) {
 
   def view[A](lens: Lens[M, A]): View[F, A] = {
     val fixedLens = FixedLens.fromLensAndModelRef(lens, modelRef)
-    new View(fixedLens, stream.map(lens.get)) // Do we have to split the stream here or pass the same one? Topic?
+    // Do we have to split the stream here or pass the same one? Topic?
+    // Also: do we have to watch out for resource leaks?
+    new View(fixedLens, stream.map(lens.get))
   }
 }

@@ -8,12 +8,20 @@ import boopickle.Default._
 import diode.data._
 import spatutorial.shared.{Api, TodoItem}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.global
-import scala.util.{Failure, Success}
 import scala.language.higherKinds
+import scala.util.{Failure, Success}
 
 object Algebras {
+  private def asyncCall[F[_] : Async, A](invocation: Future[A])(implicit ec: ExecutionContext): F[A] =
+    Async[F].async { cb =>
+      invocation.onComplete {
+        case Success(value) => cb(Right(value))
+        case Failure(t) => cb(Left(t))
+      }
+    }
+
   trait LogAlgebra[F[_]] {
     def log(msg: String): F[Unit]
   }
@@ -27,15 +35,10 @@ object Algebras {
   }
 
   class MotdAlgebraInterpreter[F[_] : Effect](lens: FixedLens[F, Pot[String]]) extends MotdAlgebra[F] {
-    implicit private val ec: ExecutionContext = global
+    implicit protected val ec: ExecutionContext = global
 
     protected def queryMotd: F[String] =
-      Async[F].async { cb =>
-        AjaxClient[Api].welcomeMsg("User X").call().onComplete {
-          case Success(value) => cb(Right(value))
-          case Failure(t) => cb(Left(t))
-        }
-      }
+      asyncCall(AjaxClient[Api].welcomeMsg("User X").call())
 
     def updateMotd: F[Unit] =
       for {
@@ -54,32 +57,17 @@ object Algebras {
   }
 
   class TodosAlgebraInterpreter[F[_] : Effect](lens: FixedLens[F, Pot[Todos]]) extends TodosAlgebra[F] {
-    implicit private val ec: ExecutionContext = global
+    implicit protected val ec: ExecutionContext = global
 
     protected object Ajax {
       def getAllTodos(): F[Seq[TodoItem]] =
-        Async[F].async { cb =>
-          AjaxClient[Api].getAllTodos().call().onComplete {
-            case Success(value) => cb(Right(value))
-            case Failure(t) => cb(Left(t))
-          }
-        }
+        asyncCall(AjaxClient[Api].getAllTodos().call())
 
       def updateTodo(item: TodoItem): F[Seq[TodoItem]] =
-        Async[F].async { cb =>
-          AjaxClient[Api].updateTodo(item).call().onComplete {
-            case Success(value) => cb(Right(value))
-            case Failure(t) => cb(Left(t))
-          }
-        }
+        asyncCall(AjaxClient[Api].updateTodo(item).call())
 
       def deleteTodo(itemId: String): F[Seq[TodoItem]] =
-        Async[F].async { cb =>
-          AjaxClient[Api].deleteTodo(itemId).call().onComplete {
-            case Success(value) => cb(Right(value))
-            case Failure(t) => cb(Left(t))
-          }
-        }
+        asyncCall(AjaxClient[Api].deleteTodo(itemId).call())
     }
 
     def refreshTodos(): F[Unit] =
