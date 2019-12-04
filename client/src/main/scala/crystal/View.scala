@@ -34,7 +34,7 @@ class View[F[_] : ConcurrentEffect, A](fixedLens: FixedLens[F, A], stream: Strea
   override def modify(f: A => A): F[Unit] =
     fixedLens.modify(f)
 
-  /*override protected[crystal]*/ def compose[B](otherLens: Lens[A, B]): FixedLens[F, B] =
+  override protected[crystal] def compose[B](otherLens: Lens[A, B]): FixedLens[F, B] =
     throw new Exception("Views cannot be composed with other lenses. Try .zoom or .map instead.")
 
   // zoom takes a lens, we can continue writing to the model.
