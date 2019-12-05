@@ -10,6 +10,7 @@ import crystal.implicits._
 import spatutorial.client.services.Algebras._
 import diode.react.ReactPot._
 import spatutorial.client.services.AppState.MotdFocus
+import spatutorial.client.services.{LogAlgebra, MotdAlgebra}
 
 /**
  * This is a simple component demonstrating how to display async data coming from the server

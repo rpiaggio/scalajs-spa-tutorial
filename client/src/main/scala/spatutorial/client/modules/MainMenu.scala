@@ -12,7 +12,8 @@ import spatutorial.client.components.Bootstrap.CommonStyle
 import spatutorial.client.components.Icon._
 import spatutorial.client.components._
 import scalacss.ScalaCssReact._
-import spatutorial.client.services.Algebras.TodosAlgebra
+import spatutorial.client.services.Algebras._
+import spatutorial.client.services.TodosAlgebra
 
 case class MainMenu(
                      router: RouterCtl[Loc],

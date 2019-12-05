@@ -11,7 +11,7 @@ import spatutorial.client.services.AppState
 
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import CssSettings._
-import cats.effect.{IO, Timer}
+import cats.effect.{ContextShift, IO, Timer}
 import crystal.ViewRO
 import scalacss.ScalaCssReact._
 import spatutorial.client.services.AppState.RootModel
@@ -35,8 +35,21 @@ object SPAMain {
 
   case object ProgressLoc extends Loc
 
-  val MaxProgress = 1000
-  def progressFlow: Stream[IO, Int] = Stream.range(0, MaxProgress + 1).covary[IO].metered(50 milliseconds)
+
+  implicit private val csIO: ContextShift[IO] = IO.contextShift(global)
+
+  val MaxProgress = 10000
+  def smoothFlow(init: Int): Stream[IO, Int] = {
+    Stream.iterateEval(init * 1000)(i => IO(i + 1))
+      .takeWhile(_ <= math.min((init + 1) * 1000, MaxProgress))
+      .covary[IO]
+      .metered(50 milliseconds)
+  }
+
+  val processProgressFlow = Stream.range(0, 10).covary[IO].metered(10 seconds)
+
+  val progressFlow = processProgressFlow.switchMap(smoothFlow)//.evalTap(p => IO(println(p)))
+
 
   // configure the router
   val routerConfig = RouterConfigDsl[Loc].buildConfig { dsl =>

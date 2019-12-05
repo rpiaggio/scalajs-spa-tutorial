@@ -15,9 +15,14 @@ object AppState {
   implicit private val csIO: ContextShift[IO] = IO.contextShift(global)
 
   @Lenses
-  case class RootModel(todos: Pot[Todos], motd: Pot[String], motdInstant: Option[Instant])
+  case class RootModel(
+                        todos: Pot[Todos],
+                        motd: Pot[String],
+                        motdInstant: Option[Instant],
+                        progress: Int
+                      )
 
-  val rootModel = Model[IO, RootModel](RootModel(Empty, Empty, None))
+  val rootModel = Model[IO, RootModel](RootModel(Empty, Empty, None, 0))
 
   val todosView: View[IO, Pot[Todos]] = rootModel.view(RootModel.todos)
 
@@ -29,4 +34,6 @@ object AppState {
       f => _.copy(motd = f.motd, motdInstant = f.motdInstant))
 
   val motdFocusView: View[IO, MotdFocus] = rootModel.view(motdFocusL)
+
+  val progressView: View[IO, Int] = rootModel.view(RootModel.progress)
 }

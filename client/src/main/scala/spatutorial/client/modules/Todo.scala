@@ -14,7 +14,7 @@ import crystal._
 import crystal.implicits._
 import react.common.ReactProps
 import scalacss.ScalaCssReact._
-import spatutorial.client.services.Algebras.{LogAlgebra, TodosAlgebra}
+import spatutorial.client.services.Algebras._
 
 final case class Todo(view: View[IO, Pot[Todos]]) extends ReactProps {
   @inline def render: VdomElement = Todo.component(this)
