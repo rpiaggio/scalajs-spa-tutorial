@@ -1,21 +1,31 @@
 package spatutorial.client.components
 
-import fs2._
-import cats.effect.{ContextShift, IO}
+import cats.effect.{ContextShift, IO, Timer}
 import crystal.Flow.ReactFlowComponent
 import crystal._
+import crystal.implicits._
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import react.common.ReactProps
-import spatutorial.client.components.Bootstrap.Panel
+import spatutorial.client.components.Bootstrap.{Button, CommonStyle, Panel}
+import spatutorial.client.services.ProgressAlgebraInterpreter
 
 import scala.concurrent.ExecutionContext.global
 
 final case class Progress(
-                           total: Int,
-                           progress: Stream[IO, Int]
+                           view: View[IO, Int]
                          ) extends ReactProps {
   @inline def render: VdomElement = Progress.component(this)
+
+  implicit private val timerIO: Timer[IO] = cats.effect.IO.timer(global)
+  implicit private val csIO: ContextShift[IO] = IO.contextShift(global)
+
+  // Algebras can be requested directly, they don't need to go through the implicit mechanism.
+  val algebra = new ProgressAlgebraInterpreter[IO](view)
+
+  val total = algebra.MaxProgressSeconds * 1000
+
+  val smoothProgress = algebra.progressFlow(view.stream)
 }
 
 object Progress {
@@ -23,16 +33,23 @@ object Progress {
 
   type Props = Progress
 
-  case class State(flow: ReactFlowComponent[Int])
+  case class State(smoothFlow: ReactFlowComponent[Int])
 
   val component = ScalaComponent.builder[Props]("Progress")
-    .initialStateFromProps(p => State(Flow.flow(p.progress)))
+    .initialStateFromProps(p => State(Flow.flow(p.smoothProgress)))
     .render { $ =>
       Panel("Progress")(
-        $.state.flow { progressOpt =>
-          <.progress(^.max := $.props.total, ^.value := progressOpt.getOrElse(0))
-        }
+        $.state.smoothFlow { smoothProgressOpt =>
+          <.progress(^.width := 400.px, ^.max := $.props.total, ^.value := smoothProgressOpt.getOrElse(0))
+        },
+        $.props.view.flow { progressOpt =>
+          <.p(s"Progress: ${progressOpt.map(_ + 1).getOrElse(0)} seconds")
+        },
+        Button(
+          $.props.algebra.increment(),
+          CommonStyle.danger)(Icon.plus, " Increase"),
       )
     }
+    .componentWillMount($ => $.props.algebra.reset())
     .build
 }
