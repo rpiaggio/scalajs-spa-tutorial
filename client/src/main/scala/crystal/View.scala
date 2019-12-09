@@ -2,7 +2,8 @@ package crystal
 
 import cats.effect.ConcurrentEffect
 import cats.implicits._
-import crystal.Flow.ReactFlowComponent
+import crystal.react.Flow
+import crystal.react.Flow.ReactFlowComponent
 import fs2._
 import monocle.Lens
 

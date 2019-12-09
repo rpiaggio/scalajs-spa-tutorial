@@ -1,12 +1,13 @@
-package crystal
+package crystal.react
 
-import japgolly.scalajs.react._
+import cats.effect.{CancelToken, ConcurrentEffect, Effect, IO, Sync, SyncIO}
 import japgolly.scalajs.react.component.Generic.UnmountedWithRoot
-import vdom.html_<^._
-import cats.effect._
-import scala.language.higherKinds
+import japgolly.scalajs.react.vdom.html_<^.VdomElement
+import japgolly.scalajs.react.{BackendScope, Callback, CtorType, ScalaComponent}
 
 import scala.scalajs.js
+
+import scala.language.higherKinds
 
 object Flow {
   type ReactFlowProps[A] = Option[A] => VdomElement

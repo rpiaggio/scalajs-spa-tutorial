@@ -10,9 +10,9 @@ import spatutorial.client.components._
 import spatutorial.client.logger._
 import spatutorial.client.services._
 import spatutorial.shared._
-import crystal._
-import crystal.implicits._
 import react.common.ReactProps
+import crystal._
+import crystal.react.implicits._
 import scalacss.ScalaCssReact._
 import spatutorial.client.services.Algebras._
 

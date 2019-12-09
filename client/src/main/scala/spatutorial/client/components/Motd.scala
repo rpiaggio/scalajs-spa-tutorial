@@ -6,7 +6,7 @@ import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
 import spatutorial.client.components.Bootstrap.{Button, _}
 import crystal._
-import crystal.implicits._
+import crystal.react.implicits._
 import spatutorial.client.services.Algebras._
 import diode.react.ReactPot._
 import spatutorial.client.services.AppState.MotdFocus

@@ -6,7 +6,7 @@ import japgolly.scalajs.react.vdom.html_<^._
 import scalacss.ScalaCssReact._
 import spatutorial.client.components.Bootstrap.{Button, CommonStyle}
 import spatutorial.shared._
-import crystal.implicits._
+import crystal.react.implicits._
 import react.common.ReactProps
 
 final case class TodoList(
