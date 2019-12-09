@@ -5,14 +5,14 @@ import diode.react.ReactPot._
 import diode.data.Pot
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import react.common.ReactProps
 import spatutorial.client.components.Bootstrap._
 import spatutorial.client.components._
 import spatutorial.client.logger._
 import spatutorial.client.services._
 import spatutorial.shared._
-import react.common.ReactProps
 import crystal._
-import crystal.react.implicits._
+import crystal.react.io.implicits._
 import scalacss.ScalaCssReact._
 import spatutorial.client.services.Algebras._
 

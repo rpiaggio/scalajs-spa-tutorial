@@ -4,7 +4,6 @@ import play.sbt.PlayImport._
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import sbt.Keys.{scalacOptions, _}
 
-
 /**
  * Application settings. Configure the build for your application here.
  * You normally don't have to touch the actual build definition after this.
@@ -32,12 +31,14 @@ object Settings {
     val scalajsReact = "1.4.2"
     val scalaCSS = "0.5.3"
     val scalajsReactCommon = "0.3.2"
+    val scalaJavaTime = "2.0.0-RC2"
     val log4js = "1.4.10"
     val autowire = "0.2.6"
     val booPickle = "1.3.1"
     val diodeData = "1.1.5"
     val diodeReact = "1.1.5.142"
     val uTest = "0.4.7"
+    val scalajsScripts = "1.1.4"
 
     val react = "16.7.0"
     val jQuery = "1.11.1"
@@ -46,10 +47,9 @@ object Settings {
 
     val cats = "2.0.0"
     val fs2 = "2.0.0"
-    //val crystal = "0.0.3-SNAPSHOT" // For the moment crystal is being developed here. It will eventually be its own project.
     val monocle = "2.0.0"
 
-    val scalajsScripts = "1.1.4"
+    val crystal = "0.0.9"
   }
 
   /**
@@ -82,8 +82,8 @@ object Settings {
     "org.typelevel" %%% "cats-core" % versions.cats,
     "org.typelevel" %%% "cats-effect" % versions.cats,
     "co.fs2" %%% "fs2-core" % versions.fs2,
-    "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC2",
-    // "com.rpiaggio" %%% "crystal" % versions.crystal, // For the moment crystal is being developed here.
+    "io.github.cquiroz" %%% "scala-java-time" % versions.scalaJavaTime,
+    "com.rpiaggio" %%% "crystal" % versions.crystal,
     "com.github.julien-truffaut" %%%  "monocle-core"  % versions.monocle,
     "com.github.julien-truffaut" %%%  "monocle-macro"  % versions.monocle,
     "com.lihaoyi" %%% "utest" % versions.uTest % Test

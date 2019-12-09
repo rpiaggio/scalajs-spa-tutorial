@@ -3,11 +3,11 @@ package spatutorial.client.modules
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
+import react.common.ReactProps
 import spatutorial.client.SPAMain.{Loc, TodoLoc}
 import spatutorial.client.components._
 import crystal._
 import cats.effect._
-import react.common.ReactProps
 import spatutorial.client.services.AppState.MotdFocus
 
 import scala.util.Random

@@ -1,12 +1,12 @@
 package spatutorial.client.modules
 
 import cats.effect.IO
-import react.common.ReactProps
-import crystal._
-import crystal.react.implicits._
-import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router.RouterCtl
 import japgolly.scalajs.react.vdom.html_<^._
+import react.common.ReactProps
+import crystal._
+import crystal.react.io.implicits._
+import japgolly.scalajs.react._
 import spatutorial.client.SPAMain.{DashboardLoc, Loc, ProgressLoc, TodoLoc}
 import spatutorial.client.components.Bootstrap.CommonStyle
 import spatutorial.client.components.Icon._

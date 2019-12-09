@@ -1,13 +1,14 @@
 package spatutorial.client.components
 
 import cats.effect.{ContextShift, IO, Timer}
-import react.common.ReactProps
-import crystal._
-import crystal.react.implicits._
-import crystal.react.Flow
-import crystal.react.Flow.ReactFlowComponent
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import react.common.ReactProps
+import crystal._
+import crystal.react.io.implicits._
+import crystal.react.Flow
+import crystal.react.Flow.ReactFlowComponent
+
 import spatutorial.client.components.Bootstrap.{Button, CommonStyle, Panel}
 import spatutorial.client.services.ProgressAlgebraInterpreter
 import scala.concurrent.ExecutionContext.global

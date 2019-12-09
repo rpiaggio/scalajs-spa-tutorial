@@ -1,8 +1,6 @@
 import sbt.Keys._
 import sbt.Project.projectToRef
-import com.typesafe.sbt.web.PathMapping
 import sbtcrossproject.CrossPlugin.autoImport.{CrossType, crossProject}
-import com.typesafe.sbt.web.pipeline.Pipeline
 
 // a special crossProject for configuring a JS/JVM/shared structure
 lazy val shared = (crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure) in file("shared"))

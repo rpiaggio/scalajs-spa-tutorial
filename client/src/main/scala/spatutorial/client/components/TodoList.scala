@@ -3,11 +3,11 @@ package spatutorial.client.components
 import cats.effect.IO
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.vdom.html_<^._
+import react.common.ReactProps
 import scalacss.ScalaCssReact._
 import spatutorial.client.components.Bootstrap.{Button, CommonStyle}
 import spatutorial.shared._
-import crystal.react.implicits._
-import react.common.ReactProps
+import crystal.react.io.implicits._
 
 final case class TodoList(
   items: Seq[TodoItem],
