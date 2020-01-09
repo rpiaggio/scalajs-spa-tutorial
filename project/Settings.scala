@@ -25,10 +25,9 @@ object Settings {
 
   /** Declare global dependency versions here to avoid mismatches in multi part dependencies */
   object versions {
-//    val scala = "2.11.11"
     val scala = "2.12.10"
     val scalaDom = "0.9.7"
-    val scalajsReact = "1.4.2"
+    val scalajsReact = "1.5.0"
     val scalaCSS = "0.5.3"
     val scalajsReactCommon = "0.3.2"
     val scalaJavaTime = "2.0.0-RC2"
@@ -49,7 +48,7 @@ object Settings {
     val fs2 = "2.0.0"
     val monocle = "2.0.0"
 
-    val crystal = "0.0.9"
+    val crystal = "0.0.10"
   }
 
   /**

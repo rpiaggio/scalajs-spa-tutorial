@@ -37,7 +37,7 @@ object SPAMain {
       | staticRoute("#motd", MotdLoc) ~> render(Motd(AppState.motdFocusView))
       | staticRoute("#todo", TodoLoc) ~> render(Todo(AppState.todosView))
       | staticRoute("#progress", ProgressLoc) ~> render(Progress(AppState.progressView))
-      ).notFound(redirectToPage(DashboardLoc)(Redirect.Replace))
+      ).notFound(redirectToPage(DashboardLoc)(SetRouteVia.HistoryReplace))
   }.renderWith(layout)
 
   // This uses another view over the same data as AppState.todosView, but just for demo purposes we define a new one.
