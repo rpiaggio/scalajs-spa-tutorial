@@ -1,0 +1,14 @@
+{
+  "environments": {
+    "test": {
+      "buildpacks": [
+        {
+          "url": "heroku/nodejs"
+        },
+        {
+          "url": "heroku/scala"
+        }
+      ]
+    }
+  }
+}
