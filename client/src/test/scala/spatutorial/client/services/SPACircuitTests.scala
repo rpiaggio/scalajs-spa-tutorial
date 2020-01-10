@@ -82,13 +82,17 @@ object SPACircuitTests extends TestSuite {
           case _ =>
             assert(false)
         }
-      }
+      } */
     }
 
     'MotdHandler - {
-      val model: Pot[String] = Ready("Message of the Day!")
-      def build = new MotdHandler(new RootModelRW(model))
+      val model = Model[IO, Pot[String]](Ready("Message of the Day!"))
+      def build = {
+        val view = model.view(Iso.id[Pot[String]].asLens)
+        (view, view.algebra[MotdAlgebra])
+      }
 
+      /*
       'UpdateMotd - {
         val h = build
         var result = h.handle(UpdateMotd())
