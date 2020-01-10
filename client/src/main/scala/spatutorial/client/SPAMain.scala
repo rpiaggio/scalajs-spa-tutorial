@@ -64,7 +64,7 @@ object SPAMain {
 
   @JSExport
   def main(args: Array[String]): Unit = {
-    log.warn("Application starting")
+    log.warn("Application starting in Heroku")
     // send log messages also to the server
     log.enableServerLogging("/logging")
     log.info("This message goes to server as well")
