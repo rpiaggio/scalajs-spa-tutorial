@@ -28,6 +28,7 @@ object SPAMain {
 
   case object ProgressLoc extends Loc
 
+
   // configure the router
   val routerConfig = RouterConfigDsl[Loc].buildConfig { dsl =>
     import dsl._
