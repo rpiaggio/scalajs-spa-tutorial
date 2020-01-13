@@ -1,0 +1,17 @@
+{
+  "environments": {
+    "test": {
+      "buildpacks": [
+        {
+          "url": "heroku/nodejs"
+        },
+        {
+          "url": "heroku/scala"
+        }
+      ],
+      "scripts" : {
+        "test-setup": "npm install jsdom"
+      }
+    }
+  }
+}
