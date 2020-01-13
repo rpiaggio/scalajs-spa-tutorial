@@ -11,6 +11,12 @@
       ],
       "scripts" : {
         "test-setup": "npm install jsdom"
+      },
+      "formation": {
+        "test": {
+          "quantity": 1,
+          "size": "performance-l"
+        }
       }
     }
   }
