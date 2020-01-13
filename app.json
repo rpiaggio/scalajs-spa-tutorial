@@ -1,6 +1,12 @@
 {
   "environments": {
     "test": {
+      "formation": {
+        "test": {
+          "quantity": 1,
+          "size": "performance-m"
+        }
+      },
       "buildpacks": [
         {
           "url": "heroku/nodejs"
