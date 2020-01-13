@@ -12,5 +12,7 @@ jobs:
         uses: olafurpg/setup-scala@v2
         with:
           java-version: 1.8
+      - name: Install dependencies
+        run: npm install jsdom
       - name: Run tests
         run: csbt test
