@@ -1,6 +1,12 @@
 {
   "environments": {
     "test": {
+      "formation": {
+        "test": {
+          "quantity": 1,
+          "size": "performance-l"
+        }
+      },
       "buildpacks": [
         {
           "url": "heroku/nodejs"
@@ -11,12 +17,6 @@
       ],
       "scripts" : {
         "test-setup": "npm install jsdom"
-      },
-      "formation": {
-        "test": {
-          "quantity": 1,
-          "size": "performance-l"
-        }
       }
     }
   }
